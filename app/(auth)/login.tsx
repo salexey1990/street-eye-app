@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
+import { authApi } from '@/lib/api/client';
 
 export default function Login() {
   const router = useRouter();
@@ -31,15 +32,14 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      // TODO: POST /auth/login → сохранить токены в SecureStore
-      // const { accessToken, refreshToken } = await authApi.login({ email, password });
-      // await SecureStore.setItemAsync('refresh_token', refreshToken);
+      await authApi.login({ email, password });
       router.replace('/(tabs)');
     } catch (e: any) {
-      const code = e?.response?.data?.code;
+      const code = e?.response?.data?.error?.message;
       if (code === 'INVALID_CREDENTIALS') setError('Неверный email или пароль');
       else if (code === 'EMAIL_NOT_VERIFIED') setError('Подтвердите email — письмо отправлено при регистрации');
       else if (code === 'RATE_LIMIT_EXCEEDED') setError('Слишком много попыток. Подождите 15 минут');
+      else if (e?.response) setError('Нет подключения к интернету');
       else setError('Нет подключения к интернету');
     } finally {
       setLoading(false);

@@ -14,6 +14,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
+import { authApi } from '@/lib/api/client';
 
 export default function Register() {
   const router = useRouter();
@@ -40,11 +41,10 @@ export default function Register() {
     setLoading(true);
     setError(null);
     try {
-      // TODO: POST /auth/register → redirect to email-verify screen
-      // await authApi.register({ email, password });
+      await authApi.register({ email, password });
       router.push('/(auth)/email-verify' as any);
     } catch (e: any) {
-      const code = e?.response?.data?.code;
+      const code = e?.response?.data?.error?.message;
       if (code === 'EMAIL_ALREADY_EXISTS') setError('Аккаунт с таким email уже существует');
       else setError('Произошла ошибка. Попробуйте позже');
     } finally {
