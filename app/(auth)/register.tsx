@@ -13,11 +13,13 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
 import { authApi } from '@/lib/api/client';
 
 export default function Register() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,10 +30,10 @@ export default function Register() {
   const [error, setError] = useState<string | null>(null);
 
   const validate = (): string | null => {
-    if (!/.+@.+\..+/.test(email)) return 'Введите корректный email';
-    if (password.length < 8) return 'Пароль не менее 8 символов';
-    if (password !== confirmPassword) return 'Пароли не совпадают';
-    if (!accepted) return 'Примите условия использования';
+    if (!/.+@.+\..+/.test(email)) return t('auth.errors.invalidEmail');
+    if (password.length < 8) return t('auth.errors.passwordTooShort');
+    if (password !== confirmPassword) return t('auth.errors.passwordMismatch');
+    if (!accepted) return t('auth.errors.acceptTerms');
     return null;
   };
 
@@ -45,8 +47,8 @@ export default function Register() {
       router.push('/(auth)/email-verify' as any);
     } catch (e: any) {
       const code = e?.response?.data?.error?.message;
-      if (code === 'EMAIL_ALREADY_EXISTS') setError('Аккаунт с таким email уже существует');
-      else setError('Произошла ошибка. Попробуйте позже');
+      if (code === 'EMAIL_ALREADY_EXISTS') setError(t('auth.errors.emailAlreadyExists'));
+      else setError(t('auth.errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -62,12 +64,12 @@ export default function Register() {
             <Ionicons name="aperture" size={28} color={theme.colors.accent} />
             <Text style={s.logoText}>StreetEye</Text>
           </View>
-          <Text style={s.tagline}>Видь город иначе</Text>
+          <Text style={s.tagline}>{t('common.appTagline')}</Text>
 
           {/* Heading */}
           <View style={s.heading}>
-            <Text style={s.title}>Создать аккаунт</Text>
-            <Text style={s.subtitle}>Зарегистрируйтесь, чтобы начать</Text>
+            <Text style={s.title}>{t('auth.register.title')}</Text>
+            <Text style={s.subtitle}>{t('auth.register.subtitle')}</Text>
           </View>
 
           {/* Error */}
@@ -94,12 +96,12 @@ export default function Register() {
             </View>
 
             <View style={s.field}>
-              <Text style={s.label}>Пароль</Text>
+              <Text style={s.label}>{t('auth.register.password')}</Text>
               <View style={s.inputWrap}>
                 <Ionicons name="lock-closed-outline" size={20} color={theme.colors.iconMuted} />
                 <TextInput
                   style={[s.input, s.inputFlex]}
-                  placeholder="Минимум 8 символов"
+                  placeholder={t('auth.register.passwordPlaceholder')}
                   placeholderTextColor={theme.colors.textMuted}
                   value={password}
                   onChangeText={setPassword}
@@ -114,7 +116,7 @@ export default function Register() {
             </View>
 
             <View style={s.field}>
-              <Text style={s.label}>Повторите пароль</Text>
+              <Text style={s.label}>{t('auth.register.confirmPassword')}</Text>
               <View style={s.inputWrap}>
                 <Ionicons name="lock-closed-outline" size={20} color={theme.colors.iconMuted} />
                 <TextInput
@@ -138,7 +140,7 @@ export default function Register() {
               <View style={[s.checkbox, accepted && s.checkboxChecked]}>
                 {accepted && <Ionicons name="checkmark" size={14} color={theme.colors.text} />}
               </View>
-              <Text style={s.checkboxLabel}>Принимаю условия и политику конфиденциальности</Text>
+              <Text style={s.checkboxLabel}>{t('auth.register.termsAccept')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -152,20 +154,20 @@ export default function Register() {
             >
               {loading
                 ? <ActivityIndicator color={theme.colors.text} />
-                : <Text style={s.btnText}>Зарегистрироваться</Text>
+                : <Text style={s.btnText}>{t('auth.register.submit')}</Text>
               }
             </TouchableOpacity>
 
             <View style={s.divider}>
               <View style={s.dividerLine} />
-              <Text style={s.dividerText}>или</Text>
+              <Text style={s.dividerText}>{t('common.or')}</Text>
               <View style={s.dividerLine} />
             </View>
 
             <View style={s.switchRow}>
-              <Text style={s.switchText}>Уже есть аккаунт? </Text>
+              <Text style={s.switchText}>{t('auth.register.hasAccount')}</Text>
               <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
-                <Text style={s.link}>Войти</Text>
+                <Text style={s.link}>{t('auth.register.login')}</Text>
               </TouchableOpacity>
             </View>
           </View>

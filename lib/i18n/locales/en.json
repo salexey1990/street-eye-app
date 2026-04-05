@@ -1,0 +1,119 @@
+{
+  "common": {
+    "continue": "Continue",
+    "or": "or",
+    "retry": "Try again",
+    "appTagline": "See the city differently"
+  },
+  "onboarding": {
+    "welcome": {
+      "start": "Get started",
+      "hint": "Takes less than 60 seconds"
+    },
+    "language": {
+      "title": "Choose language",
+      "subtitle": "You can change this in settings at any time"
+    },
+    "level": {
+      "title": "Your level",
+      "subtitle": "Affects task difficulty. Can be changed later.",
+      "BEGINNER": {
+        "name": "Beginner",
+        "desc": "Learning photography, shooting on phone or a basic camera"
+      },
+      "INTERMEDIATE": {
+        "name": "Intermediate",
+        "desc": "Know the basics, shoot consciously, want to grow"
+      },
+      "PRO": {
+        "name": "Pro",
+        "desc": "Shooting for a long time, looking for unconventional challenges"
+      }
+    },
+    "preferences": {
+      "title": "What interests you?",
+      "subtitle": "Choose 1–2 categories. This shapes your task selection.",
+      "VISUAL": { "name": "Visual", "sub": "Light, color, form" },
+      "TECHNICAL": { "name": "Technical", "sub": "Exposure, DoF" },
+      "SOCIAL": { "name": "Social", "sub": "People, street" },
+      "LIMITATIONS": { "name": "Limitations", "sub": "Rules and constraints" }
+    },
+    "notifications": {
+      "title": "Task reminders",
+      "subtitle": "One notification per day.\nNo spam — just a nudge to go shoot.",
+      "allow": "Allow notifications",
+      "skip": "Later"
+    },
+    "firstTask": {
+      "title": "Your first task",
+      "subtitle": "Picked specifically for your preferences",
+      "start": "Let's shoot!",
+      "recommended": "Recommended: {{minutes}} minutes"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Enter your credentials",
+      "password": "Password",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "noAccount": "No account? ",
+      "register": "Register"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Register to get started",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "passwordPlaceholder": "At least 8 characters",
+      "termsAccept": "I accept the terms and privacy policy",
+      "submit": "Create account",
+      "hasAccount": "Already have an account? ",
+      "login": "Sign in"
+    },
+    "errors": {
+      "fillFields": "Please fill in all fields",
+      "invalidEmail": "Enter a valid email",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "acceptTerms": "Please accept the terms",
+      "invalidCredentials": "Invalid email or password",
+      "emailNotVerified": "Please verify your email — check the message sent at registration",
+      "rateLimitExceeded": "Too many attempts. Wait 15 minutes",
+      "noConnection": "No internet connection",
+      "emailAlreadyExists": "An account with this email already exists",
+      "generic": "Something went wrong. Try again later"
+    }
+  },
+  "task": {
+    "done": "Task completed",
+    "saveLater": "Save for later",
+    "another": "Another task",
+    "take": "Take this",
+    "attemptsLeft": "{{count}} left",
+    "tip": "Tip",
+    "categories": {
+      "VISUAL": "Visual",
+      "TECHNICAL": "Technical",
+      "SOCIAL": "Social",
+      "LIMITATIONS": "Limitations"
+    },
+    "levels": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "PRO": "Pro"
+    }
+  },
+  "journal": {
+    "title": "Journal",
+    "empty": "No entries yet",
+    "completed": "Completed",
+    "streak": "Streak",
+    "ratings": {
+      "failed": "Didn't work out",
+      "partial": "Partial",
+      "success": "Success"
+    }
+  }
+}

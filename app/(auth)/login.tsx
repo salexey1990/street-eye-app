@@ -13,11 +13,13 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
 import { authApi } from '@/lib/api/client';
 
 export default function Login() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +28,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('Заполните все поля');
+      setError(t('auth.errors.fillFields'));
       return;
     }
     setLoading(true);
@@ -36,11 +38,10 @@ export default function Login() {
       router.replace('/(tabs)');
     } catch (e: any) {
       const code = e?.response?.data?.error?.message;
-      if (code === 'INVALID_CREDENTIALS') setError('Неверный email или пароль');
-      else if (code === 'EMAIL_NOT_VERIFIED') setError('Подтвердите email — письмо отправлено при регистрации');
-      else if (code === 'RATE_LIMIT_EXCEEDED') setError('Слишком много попыток. Подождите 15 минут');
-      else if (e?.response) setError('Нет подключения к интернету');
-      else setError('Нет подключения к интернету');
+      if (code === 'INVALID_CREDENTIALS') setError(t('auth.errors.invalidCredentials'));
+      else if (code === 'EMAIL_NOT_VERIFIED') setError(t('auth.errors.emailNotVerified'));
+      else if (code === 'RATE_LIMIT_EXCEEDED') setError(t('auth.errors.rateLimitExceeded'));
+      else setError(t('auth.errors.noConnection'));
     } finally {
       setLoading(false);
     }
@@ -56,12 +57,12 @@ export default function Login() {
             <Ionicons name="aperture" size={28} color={theme.colors.accent} />
             <Text style={s.logoText}>StreetEye</Text>
           </View>
-          <Text style={s.tagline}>Видь город иначе</Text>
+          <Text style={s.tagline}>{t('common.appTagline')}</Text>
 
           {/* Heading */}
           <View style={s.heading}>
-            <Text style={s.title}>Вход в аккаунт</Text>
-            <Text style={s.subtitle}>Введите данные для входа</Text>
+            <Text style={s.title}>{t('auth.login.title')}</Text>
+            <Text style={s.subtitle}>{t('auth.login.subtitle')}</Text>
           </View>
 
           {/* Error */}
@@ -88,7 +89,7 @@ export default function Login() {
             </View>
 
             <View style={s.field}>
-              <Text style={s.label}>Пароль</Text>
+              <Text style={s.label}>{t('auth.login.password')}</Text>
               <View style={s.inputWrap}>
                 <Ionicons name="lock-closed-outline" size={20} color={theme.colors.iconMuted} />
                 <TextInput
@@ -112,7 +113,7 @@ export default function Login() {
             </View>
 
             <TouchableOpacity style={s.forgotRow} onPress={() => router.push('/(auth)/forgot-password' as any)}>
-              <Text style={s.link}>Забыли пароль?</Text>
+              <Text style={s.link}>{t('auth.login.forgot')}</Text>
             </TouchableOpacity>
           </View>
 
@@ -126,20 +127,20 @@ export default function Login() {
             >
               {loading
                 ? <ActivityIndicator color={theme.colors.text} />
-                : <Text style={s.btnText}>Войти</Text>
+                : <Text style={s.btnText}>{t('auth.login.submit')}</Text>
               }
             </TouchableOpacity>
 
             <View style={s.divider}>
               <View style={s.dividerLine} />
-              <Text style={s.dividerText}>или</Text>
+              <Text style={s.dividerText}>{t('common.or')}</Text>
               <View style={s.dividerLine} />
             </View>
 
             <View style={s.switchRow}>
-              <Text style={s.switchText}>Нет аккаунта? </Text>
+              <Text style={s.switchText}>{t('auth.login.noAccount')}</Text>
               <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                <Text style={s.link}>Зарегистрироваться</Text>
+                <Text style={s.link}>{t('auth.login.register')}</Text>
               </TouchableOpacity>
             </View>
           </View>

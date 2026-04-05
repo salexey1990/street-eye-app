@@ -1,0 +1,2611 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "Returns service status and database connectivity. Used by monitoring and load balancers. No authentication required.",
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Service is healthy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "status": "ok",
+                      "db": "up",
+                      "uptime": 3600
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-01T10:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Health check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/users/me": {
+      "get": {
+        "description": "Returns full profile including locale, level, preferred categories, and aggregated stats (total completed, streak, badges).",
+        "operationId": "UsersController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "User profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "email": "user@example.com",
+                      "isEmailVerified": true,
+                      "locale": "EN",
+                      "level": "BEGINNER",
+                      "preferredCategories": [
+                        "VISUAL",
+                        "SOCIAL"
+                      ],
+                      "createdAt": "2026-03-01T08:00:00.000Z",
+                      "isPremium": false,
+                      "subscriptionExpiresAt": null,
+                      "stats": {
+                        "totalCompleted": 5,
+                        "currentStreak": 3,
+                        "badgesEarned": 2
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get current user profile",
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "description": "Updates level, preferred categories, or locale. All fields are optional — only provided fields are changed.",
+        "operationId": "UsersController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "email": "user@example.com",
+                      "isEmailVerified": true,
+                      "locale": "RU",
+                      "level": "INTERMEDIATE",
+                      "preferredCategories": [
+                        "VISUAL",
+                        "TECHNICAL"
+                      ],
+                      "createdAt": "2026-03-01T08:00:00.000Z",
+                      "isPremium": false,
+                      "subscriptionExpiresAt": null,
+                      "stats": {
+                        "totalCompleted": 5,
+                        "currentStreak": 3,
+                        "badgesEarned": 2
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error (invalid enum, empty categories array, etc.).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "VALIDATION_ERROR",
+                      "message": "Validation failed",
+                      "details": [
+                        {
+                          "field": "level",
+                          "message": "level must be one of: BEGINNER, INTERMEDIATE, PRO"
+                        }
+                      ]
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Update profile",
+        "tags": [
+          "users"
+        ]
+      },
+      "delete": {
+        "description": "Permanently deletes the account and all associated data (sessions, journal entries, badges). This action is irreversible.",
+        "operationId": "UsersController_deleteAccount",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Account deleted."
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Delete account",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/users/me/password": {
+      "patch": {
+        "description": "Requires the current password. On success, all existing refresh tokens are invalidated — user must log in again on other devices.",
+        "operationId": "UsersController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed successfully."
+          },
+          "400": {
+            "description": "Current password incorrect or new password too short.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "INVALID_CREDENTIALS",
+                      "message": "Current password is incorrect",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Change password",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "description": "Creates an account and sends a verification email. Account is inactive until email is verified.\n\nOptionally accepts onboarding data collected before registration (`level`, `preferredCategories`, `locale`). If omitted, Prisma defaults apply (`BEGINNER`, `[VISUAL]`, `EN`).",
+        "operationId": "AuthController_register",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created — verification email sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "Verification email sent to user@example.com"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "VALIDATION_ERROR",
+                      "message": "Validation failed",
+                      "details": [
+                        {
+                          "field": "email",
+                          "message": "email must be an email"
+                        },
+                        {
+                          "field": "password",
+                          "message": "password must be longer than or equal to 8 characters"
+                        }
+                      ]
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "CONFLICT",
+                      "message": "Email already registered",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (10 requests / hour per IP).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Register a new user",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/verify-email": {
+      "post": {
+        "description": "Activates the account using the token from the verification email. Token is valid for 24 hours and single-use.",
+        "operationId": "AuthController_verifyEmail",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email verified successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "Email verified successfully"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Token invalid, expired, or already used.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Token is invalid or has expired",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Verify email address",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "description": "Returns a short-lived access token (15 min) and a long-lived refresh token (30 days). Email must be verified.",
+        "operationId": "AuthController_login",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3MDk4OTM2MDAsImV4cCI6MTcwOTg5NDUwMH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                      "refreshToken": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456ab"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "INVALID_CREDENTIALS",
+                      "message": "Invalid email or password",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Email not verified.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "EMAIL_NOT_VERIFIED",
+                      "message": "Please verify your email before logging in",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (5 requests / 15 min per IP).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Log in",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "description": "Issues a new access + refresh token pair. The old refresh token is immediately invalidated (rotation). Re-use of a consumed token returns 401.",
+        "operationId": "AuthController_refresh",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New token pair issued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhMWIyYzNkNC1lNWY2LTc4OTAtYWJjZC1lZjEyMzQ1Njc4OTAiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3MDk4OTM2MDAsImV4cCI6MTcwOTg5NDUwMH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                      "refreshToken": "x9y8z7w6v5u4t3s2r1q0p9o8n7m6l5k4j3i2h1g0f9e8d7c6b5a4z3y2x1w0v9u8"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token invalid or expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Refresh token is invalid or has expired",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Refresh access token",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "description": "Invalidates the provided refresh token. Access token expires naturally (15 min TTL).",
+        "operationId": "AuthController_logout",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged out successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "Logged out successfully"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token / refresh token not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Log out",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "description": "Sends a password reset link to the email if it is registered. Always returns 200 to prevent email enumeration.",
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset email sent (or silently skipped for unknown addresses).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "If this email is registered, a reset link has been sent"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (3 requests / 10 min per IP).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Request password reset",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "description": "Sets a new password using the token from the reset email. Token is valid for 30 minutes and single-use. All existing refresh tokens are invalidated.",
+        "operationId": "AuthController_resetPassword",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "Password reset successfully. Please log in with your new password."
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Token invalid, expired, or already used.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Reset token is invalid or has expired",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Reset password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/resend-verify": {
+      "post": {
+        "description": "Sends a new verification email if the address is registered and not yet verified. Always returns 200.",
+        "operationId": "AuthController_resendVerify",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale for email content: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "ru"
+              ],
+              "default": "en"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerifyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email sent (or silently skipped).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "message": "If this email is registered and unverified, a new verification email has been sent"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (3 requests / 10 min per IP).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resend verification email",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/tasks/random": {
+      "get": {
+        "description": "Returns a random task matching user level and preferred categories. Excludes the last 5 tasks. Does not create a session — call POST /sessions to start.",
+        "operationId": "TasksController_getRandom",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A random task in the requested locale.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                      "title": "Shadows Only",
+                      "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                      "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "durationMins": 60,
+                      "tags": [
+                        "light",
+                        "shadow",
+                        "abstract"
+                      ]
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No tasks match user filters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "No tasks available for your filters",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get random task",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/tasks/random/guest": {
+      "get": {
+        "description": "Public endpoint for onboarding step 6 — shown before registration. Returns a random task matching provided filters. Does not create a session.\n\nRate limit: **5 requests / 15 min per IP** (stricter than authenticated endpoint).",
+        "operationId": "TasksController_getRandomGuest",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "BEGINNER",
+                "INTERMEDIATE",
+                "PRO"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "categories",
+            "required": true,
+            "in": "query",
+            "description": "1–2 categories",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "VISUAL",
+                  "TECHNICAL",
+                  "SOCIAL",
+                  "RESTRICTION"
+                ]
+              }
+            }
+          },
+          {
+            "name": "locale",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "EN",
+                "RU"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A random task in the requested locale.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                      "title": "Shadows Only",
+                      "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                      "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "durationMins": 60,
+                      "tags": [
+                        "light",
+                        "shadow",
+                        "abstract"
+                      ]
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "VALIDATION_ERROR",
+                      "message": "Validation failed",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get random task for guest (onboarding)",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "description": "Returns a specific task by its ID in the requested locale. Used to restore an active session on app restart.",
+        "operationId": "TasksController_getById",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Task UUID",
+            "schema": {
+              "example": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                      "title": "Shadows Only",
+                      "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                      "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "durationMins": 60,
+                      "tags": [
+                        "light",
+                        "shadow",
+                        "abstract"
+                      ]
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "Task not found",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get task by ID",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/tasks": {
+      "get": {
+        "description": "Returns a paginated list of active tasks. Supports filtering by level, category, and tags. Useful for browsing the task library.",
+        "operationId": "TasksController_findAll",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "BEGINNER",
+              "type": "string",
+              "enum": [
+                "BEGINNER",
+                "INTERMEDIATE",
+                "PRO"
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VISUAL",
+              "type": "string",
+              "enum": [
+                "VISUAL",
+                "TECHNICAL",
+                "SOCIAL",
+                "RESTRICTION"
+              ]
+            }
+          },
+          {
+            "name": "tags",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated list of tags",
+            "schema": {
+              "example": "light,street",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of tasks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "items": [
+                        {
+                          "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                          "title": "Shadows Only",
+                          "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                          "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                          "category": "VISUAL",
+                          "level": "BEGINNER",
+                          "durationMins": 60,
+                          "tags": [
+                            "light",
+                            "shadow",
+                            "abstract"
+                          ]
+                        },
+                        {
+                          "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+                          "title": "Strangers",
+                          "description": "Approach and photograph at least one stranger with their permission.",
+                          "tip": "Smile first, explain you are doing a photography challenge.",
+                          "category": "SOCIAL",
+                          "level": "INTERMEDIATE",
+                          "durationMins": 90,
+                          "tags": [
+                            "people",
+                            "portrait",
+                            "social"
+                          ]
+                        }
+                      ],
+                      "total": 30,
+                      "page": 1,
+                      "limit": 20
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "List tasks with filters",
+        "tags": [
+          "tasks"
+        ]
+      }
+    },
+    "/sessions": {
+      "post": {
+        "description": "Creates an ACTIVE session for a task when the user taps \"Take this task\". Only one ACTIVE session is allowed per user at a time.",
+        "operationId": "SessionsController_create",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "taskId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                      "status": "ACTIVE",
+                      "startedAt": "2026-03-15T09:30:00.000Z",
+                      "completedAt": null
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "Task not found",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User already has an active session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "ACTIVE_SESSION_EXISTS",
+                      "message": "You already have an active session. Complete or skip it first.",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Create session",
+        "tags": [
+          "sessions"
+        ]
+      },
+      "get": {
+        "description": "Returns the user's session history with cursor-based pagination. Optionally filter by status.",
+        "operationId": "SessionsController_findAll",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "COMPLETED",
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "COMPLETED",
+                "SKIPPED",
+                "SAVED_FOR_LATER"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Session ID to paginate from (cursor-based)",
+            "schema": {
+              "example": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated session list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "items": [
+                        {
+                          "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                          "taskId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                          "category": "VISUAL",
+                          "level": "BEGINNER",
+                          "status": "COMPLETED",
+                          "startedAt": "2026-03-15T09:30:00.000Z",
+                          "completedAt": "2026-03-15T10:00:00.000Z"
+                        },
+                        {
+                          "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+                          "taskId": "e5f6a7b8-c9d0-1234-efab-345678901234",
+                          "category": "SOCIAL",
+                          "level": "INTERMEDIATE",
+                          "status": "SKIPPED",
+                          "startedAt": "2026-03-14T14:00:00.000Z",
+                          "completedAt": null
+                        }
+                      ],
+                      "nextCursor": null,
+                      "hasMore": false
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "List sessions (cursor-based)",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/sessions/active": {
+      "get": {
+        "description": "Returns the current active task session with full task details. Use on app launch to restore an in-progress task.",
+        "operationId": "SessionsController_getActive",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active session with task details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "title": "Shadows Only",
+                      "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                      "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "durationMins": 60,
+                      "tags": [
+                        "light",
+                        "shadow",
+                        "abstract"
+                      ],
+                      "sessionId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "startedAt": "2026-03-15T09:30:00.000Z"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No active session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "No active session",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get active session",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/sessions/{id}": {
+      "patch": {
+        "description": "Transitions a session: ACTIVE → COMPLETED | SKIPPED | SAVED_FOR_LATER. Cannot modify already closed sessions (COMPLETED or SKIPPED).",
+        "operationId": "SessionsController_updateStatus",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Session UUID",
+            "schema": {
+              "example": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "taskId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                      "status": "COMPLETED",
+                      "startedAt": "2026-03-15T09:30:00.000Z",
+                      "completedAt": "2026-03-15T10:00:00.000Z"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status transition (e.g. trying to set ACTIVE).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "VALIDATION_ERROR",
+                      "message": "Cannot set status back to ACTIVE",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Session belongs to another user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "FORBIDDEN",
+                      "message": "Access denied",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "Session not found",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Session is already closed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "CONFLICT",
+                      "message": "Cannot modify a closed session",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Update session status",
+        "tags": [
+          "sessions"
+        ]
+      }
+    },
+    "/users/me/push-token": {
+      "post": {
+        "description": "Saves an Expo push token for the current device. Call on login or when the app obtains a push token.",
+        "operationId": "NotificationsController_savePushToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePushTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Push token saved."
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Save or update push token",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "delete": {
+        "description": "Removes the push token on logout so the device stops receiving notifications.",
+        "operationId": "NotificationsController_deletePushToken",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Push token deleted."
+          },
+          "401": {
+            "description": "Missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Access token is missing or invalid",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Delete push token",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/subscriptions/verify": {
+      "post": {
+        "description": "Verifies a receipt from App Store or Google Play and activates the subscription.",
+        "operationId": "SubscriptionsController_verifyPurchase",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyPurchaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Purchase verified. Returns updated subscription status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "isPremium": true,
+                      "plan": "premium",
+                      "expiresAt": "2026-05-01T00:00:00.000Z",
+                      "limits": {
+                        "tasksPerMonth": -1,
+                        "anotherTaskPerSession": 3,
+                        "journalEntriesVisible": -1
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid receipt.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "VALIDATION_ERROR",
+                      "message": "Invalid App Store receipt",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Verify in-app purchase",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/status": {
+      "get": {
+        "description": "Returns current plan, expiration date, and Free/Premium limits.",
+        "operationId": "SubscriptionsController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Subscription status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "isPremium": true,
+                      "plan": "premium",
+                      "expiresAt": "2026-05-01T00:00:00.000Z",
+                      "limits": {
+                        "tasksPerMonth": -1,
+                        "anotherTaskPerSession": 3,
+                        "journalEntriesVisible": -1
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get subscription status",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    },
+    "/subscriptions/restore": {
+      "post": {
+        "description": "Re-verifies the receipt to restore a previously purchased subscription.",
+        "operationId": "SubscriptionsController_restorePurchase",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyPurchaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Purchase restored.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "isPremium": true,
+                      "plan": "premium",
+                      "expiresAt": "2026-05-01T00:00:00.000Z",
+                      "limits": {
+                        "tasksPerMonth": -1,
+                        "anotherTaskPerSession": 3,
+                        "journalEntriesVisible": -1
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Restore purchase",
+        "tags": [
+          "subscriptions"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "StreetEye API",
+    "description": "Backend API for the StreetEye mobile app — street photography assignments, journal, and badges.\n\n**Authentication:** All protected endpoints require `Authorization: Bearer \u003Caccess_token\u003E`.\n\n**Localisation:** Pass `Accept-Language: ru` or `Accept-Language: en` to get localised content (default: `en`).\n\n**Response format:** All responses are wrapped: `{ success, data, meta: { timestamp } }`.",
+    "version": "1.2",
+    "contact": {
+
+    }
+  },
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Registration, login, token management, password reset"
+    },
+    {
+      "name": "users",
+      "description": "User profile management"
+    },
+    {
+      "name": "tasks",
+      "description": "Photography assignments — random selection, guest preview, browse"
+    },
+    {
+      "name": "sessions",
+      "description": "Active session management and history"
+    },
+    {
+      "name": "notifications",
+      "description": "Expo push token registration and removal"
+    },
+    {
+      "name": "subscriptions",
+      "description": "In-app purchase verification and Free/Premium status"
+    },
+    {
+      "name": "health",
+      "description": "Service health check"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "access-token": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "BEGINNER",
+              "INTERMEDIATE",
+              "PRO"
+            ],
+            "example": "INTERMEDIATE"
+          },
+          "preferredCategories": {
+            "type": "array",
+            "example": [
+              "VISUAL",
+              "SOCIAL"
+            ],
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "type": "string",
+              "enum": [
+                "VISUAL",
+                "TECHNICAL",
+                "SOCIAL",
+                "RESTRICTION"
+              ]
+            }
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "EN",
+              "RU"
+            ],
+            "example": "RU"
+          }
+        }
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "example": "OldPassword123"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "NewPassword456",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "minLength": 8
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "BEGINNER",
+              "INTERMEDIATE",
+              "PRO"
+            ],
+            "description": "From onboarding step 3. Default: BEGINNER"
+          },
+          "preferredCategories": {
+            "type": "array",
+            "description": "From onboarding step 4. 1–2 categories. Default: [VISUAL]",
+            "items": {
+              "type": "string",
+              "enum": [
+                "VISUAL",
+                "TECHNICAL",
+                "SOCIAL",
+                "RESTRICTION"
+              ]
+            }
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "EN",
+              "RU"
+            ],
+            "description": "From onboarding step 2. Default: EN"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "VerifyEmailDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token from the verification email link",
+            "example": "7f3d2a1e9c8b4f6a0d5e2c8b7a3f1d9e4c2a8b6f0d3e7a1c5b9f2d4e8a0c6b1"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token received from /auth/login or /auth/refresh",
+            "example": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456ab"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token from the password reset email link",
+            "example": "3e1c9a7b5d2f8e4a6c0b7d3f1e9c5a2b8d4f0e6c3a7b1d5f9e2c4a8b6d0f3e7c"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "NewPassword456",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "token",
+          "newPassword"
+        ]
+      },
+      "ResendVerifyDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CreateSessionDto": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "ID of the task to start (obtained from GET /tasks/random or GET /tasks/:id)",
+            "example": "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+          }
+        },
+        "required": [
+          "taskId"
+        ]
+      },
+      "UpdateSessionDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "COMPLETED",
+              "SKIPPED",
+              "SAVED_FOR_LATER"
+            ],
+            "example": "COMPLETED",
+            "description": "New session status. Cannot transition back to ACTIVE or modify a closed session."
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "SavePushTokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ]
+          }
+        },
+        "required": [
+          "token",
+          "platform"
+        ]
+      },
+      "VerifyPurchaseDto": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "string",
+            "description": "App Store receipt data or Google Play purchase token"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ]
+          },
+          "productId": {
+            "type": "string",
+            "example": "streeteye_premium_monthly"
+          }
+        },
+        "required": [
+          "receipt",
+          "platform",
+          "productId"
+        ]
+      }
+    }
+  }
+}
