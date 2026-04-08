@@ -86,13 +86,26 @@
       "generic": "Something went wrong. Try again later"
     }
   },
+  "registerSheet": {
+    "title": "Register to save your result",
+    "subtitle": "Takes 10 seconds",
+    "legal": "By registering, you accept the terms of use and privacy policy",
+    "checkEmail": "Check your email",
+    "checkEmailBody": "Click the link in the email, then sign in to your account."
+  },
   "task": {
     "done": "Task completed",
     "saveLater": "Save for later",
     "another": "Another task",
     "take": "Take this",
+    "getTask": "Get a task",
     "attemptsLeft": "{{count}} left",
     "tip": "Tip",
+    "timer": "Timer",
+    "timerStop": "Stop",
+    "statusActive": "Active task",
+    "emptyTitle": "No active task",
+    "emptySubtitle": "Tap the button to get a task",
     "categories": {
       "VISUAL": "Visual",
       "TECHNICAL": "Technical",
