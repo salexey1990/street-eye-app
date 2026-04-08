@@ -6,48 +6,39 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
+import { tasksApi, Task } from '@/lib/api/tasks';
 
 const TOTAL_STEPS = 5;
 const STEP = 5;
-
-interface Task {
-  id: string;
-  title: string;
-  category: string;
-  level: string;
-  description: string;
-  tip: string;
-  durationMinutes: number;
-}
 
 export default function FirstTask() {
   const router = useRouter();
   const { t } = useTranslation();
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadTask();
   }, []);
 
   const loadTask = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      // TODO: replace with real API call — GET /tasks/random/guest
-      // const raw = await AsyncStorage.getItem('onboarding_data');
-      // const { level, preferredCategories, locale } = JSON.parse(raw ?? '{}');
-      // const response = await api.get('/tasks/random/guest', { params: { level, categories: preferredCategories.join(','), locale } });
-      // setTask(response.data.data);
-
-      // Stub task for now
-      setTask({
-        id:              'stub-1',
-        title:           'Только тени',
-        category:        'VISUAL',
-        level:           'BEGINNER',
-        description:     'Найдите сцену, где тени играют главную роль. Снимайте только их — не предметы, что их отбрасывают, а сами тени как самостоятельный объект.',
-        tip:             'Ищите жёсткий дневной свет — он даёт чёткие тени. Снимайте сверху вниз.',
-        durationMinutes: 30,
-      });
+      const raw = await AsyncStorage.getItem('onboarding_data');
+      const { level = 'BEGINNER', preferredCategories = ['VISUAL'], locale = 'ru' } = raw ? JSON.parse(raw) : {};
+      const data = await tasksApi.getGuestRandom({ level, categories: preferredCategories, locale });
+      setTask(data);
+    } catch (e: any) {
+      const code = e?.response?.data?.error?.code;
+      if (code === 'RATE_LIMIT_EXCEEDED') {
+        setError(t('auth.errors.rateLimitExceeded'));
+      } else if (e?.response) {
+        setError(t('auth.errors.generic'));
+      } else {
+        setError(t('auth.errors.noConnection'));
+      }
     } finally {
       setLoading(false);
     }
@@ -56,7 +47,7 @@ export default function FirstTask() {
   const handleStart = async () => {
     await AsyncStorage.setItem('onboarding_complete', 'true');
     if (task) {
-      await AsyncStorage.setItem('active_task', JSON.stringify(task));
+      await AsyncStorage.setItem('guest_active_task', JSON.stringify(task));
     }
     router.replace('/(tabs)' as any);
   };
@@ -74,6 +65,13 @@ export default function FirstTask() {
         {loading ? (
           <View style={s.loader}>
             <ActivityIndicator color={theme.colors.accent} />
+          </View>
+        ) : error ? (
+          <View style={s.errorBox}>
+            <Text style={s.errorText}>{error}</Text>
+            <TouchableOpacity style={s.retryBtn} activeOpacity={0.8} onPress={loadTask}>
+              <Text style={s.retryText}>{t('common.retry')}</Text>
+            </TouchableOpacity>
           </View>
         ) : task ? (
           <View style={s.card}>
@@ -96,7 +94,7 @@ export default function FirstTask() {
 
             <View style={s.duration}>
               <Ionicons name="time-outline" size={15} color={theme.colors.textMuted} />
-              <Text style={s.durationText}>{t('onboarding.firstTask.recommended', { minutes: task.durationMinutes })}</Text>
+              <Text style={s.durationText}>{t('onboarding.firstTask.recommended', { minutes: task.durationMins })}</Text>
             </View>
           </View>
         ) : null}
@@ -146,6 +144,10 @@ const s = StyleSheet.create({
   tipText:         { ...theme.font.body, color: theme.colors.textSecondary, fontFamily: theme.font.family, flex: 1, lineHeight: 24 },
   duration:        { flexDirection: 'row', gap: theme.spacing.sm, alignItems: 'center' },
   durationText:    { ...theme.font.bodySmall, color: theme.colors.textMuted, fontFamily: theme.font.family },
+  errorBox:        { flex: 1, alignItems: 'center', justifyContent: 'center', gap: theme.spacing.lg },
+  errorText:       { ...theme.font.body, color: '#FF6B6B', textAlign: 'center', fontFamily: theme.font.family },
+  retryBtn:        { backgroundColor: theme.colors.bgSurface, borderRadius: theme.radius.pill, paddingHorizontal: theme.spacing.xl, paddingVertical: theme.spacing.sm },
+  retryText:       { ...theme.font.button, color: theme.colors.text, fontFamily: theme.font.family },
   footer:          { paddingHorizontal: theme.spacing.lg, paddingBottom: theme.spacing.lg },
   btn:             { backgroundColor: theme.colors.accent, borderRadius: theme.radius.pill, height: 56, alignItems: 'center', justifyContent: 'center' },
   btnText:         { ...theme.font.button, color: theme.colors.text, fontFamily: theme.font.family },

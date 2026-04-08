@@ -2,30 +2,11 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { API_URL, API_TIMEOUT } from '@/constants/config';
 
-// Access token lives in memory only
-let accessToken: string | null = null;
-
 export const api = axios.create({
   baseURL: API_URL,
   timeout: API_TIMEOUT,
   headers: { 'Content-Type': 'application/json' },
 });
-
-// Attach access token to every request
-api.interceptors.request.use((config) => {
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`;
-  }
-  return config;
-});
-
-async function refreshAccessToken(): Promise<string> {
-  const refresh = await SecureStore.getItemAsync('refresh_token');
-  if (!refresh) throw new Error('NO_REFRESH_TOKEN');
-  const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken: refresh });
-  accessToken = res.data.data.accessToken;
-  return accessToken!;
-}
 
 // Auto-refresh on 401
 api.interceptors.response.use(
@@ -34,12 +15,17 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !error.config._retry) {
       error.config._retry = true;
       try {
-        await refreshAccessToken();
+        const refresh = await SecureStore.getItemAsync('refresh_token');
+        if (!refresh) return Promise.reject(error);
+        const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken: refresh });
+        const { accessToken, refreshToken } = res.data.data;
+        await SecureStore.setItemAsync('refresh_token', refreshToken);
+        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         error.config.headers.Authorization = `Bearer ${accessToken}`;
         return api(error.config);
       } catch {
-        accessToken = null;
         await SecureStore.deleteItemAsync('refresh_token');
+        delete api.defaults.headers.common.Authorization;
         return Promise.reject(error);
       }
     }
@@ -47,13 +33,14 @@ api.interceptors.response.use(
   }
 );
 
+// Legacy authApi — kept for backward compat with existing auth screens
 export const authApi = {
   async login(body: { email: string; password: string }) {
     const res = await api.post('/auth/login', body);
-    const { accessToken: at, refreshToken: rt } = res.data.data;
-    accessToken = at;
-    await SecureStore.setItemAsync('refresh_token', rt);
-    return { accessToken: at, refreshToken: rt };
+    const { accessToken, refreshToken } = res.data.data;
+    api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+    await SecureStore.setItemAsync('refresh_token', refreshToken);
+    return { accessToken, refreshToken };
   },
 
   async register(body: { email: string; password: string }) {
@@ -61,7 +48,11 @@ export const authApi = {
   },
 
   async logout() {
-    accessToken = null;
+    const refreshToken = await SecureStore.getItemAsync('refresh_token');
+    if (refreshToken) {
+      try { await api.post('/auth/logout', { refreshToken }); } catch {}
+    }
+    delete api.defaults.headers.common.Authorization;
     await SecureStore.deleteItemAsync('refresh_token');
   },
 };

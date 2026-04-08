@@ -2020,6 +2020,631 @@
         ]
       }
     },
+    "/badges": {
+      "get": {
+        "description": "Returns all 4 badges with earned/not earned status for the current user.",
+        "operationId": "BadgesController_findAll",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Badge list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": [
+                      {
+                        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                        "key": "FIRST_STEP",
+                        "name": "First Step",
+                        "description": "Complete your first assignment",
+                        "earned": true,
+                        "earnedAt": "2026-03-15T10:00:00.000Z"
+                      },
+                      {
+                        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                        "key": "WEEK",
+                        "name": "Week",
+                        "description": "Complete 7 assignments",
+                        "earned": false,
+                        "earnedAt": null
+                      }
+                    ],
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "All badges",
+        "tags": [
+          "badges"
+        ]
+      }
+    },
+    "/badges/earned": {
+      "get": {
+        "description": "Returns only the badges the current user has earned, with date received.",
+        "operationId": "BadgesController_findEarned",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Earned badges.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": [
+                      {
+                        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                        "key": "FIRST_STEP",
+                        "name": "First Step",
+                        "description": "Complete your first assignment",
+                        "earned": true,
+                        "earnedAt": "2026-03-15T10:00:00.000Z"
+                      }
+                    ],
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Earned badges",
+        "tags": [
+          "badges"
+        ]
+      }
+    },
+    "/journal": {
+      "post": {
+        "description": "Creates a journal entry for a COMPLETED session. One entry per session.",
+        "operationId": "JournalController_create",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJournalEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Entry created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "sessionId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "note": "Great light today, caught some amazing shadows.",
+                      "selfRating": "SUCCESS",
+                      "hasPhoto": true,
+                      "createdAt": "2026-03-15T10:00:00.000Z",
+                      "updatedAt": "2026-03-15T10:00:00.000Z"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "Session not found",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Session is not COMPLETED or entry already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "CONFLICT",
+                      "message": "Session must be COMPLETED to create a journal entry",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Create journal entry",
+        "tags": [
+          "journal"
+        ]
+      },
+      "get": {
+        "description": "Returns the user's journal entries with optional filters and cursor-based pagination.",
+        "operationId": "JournalController_findAll",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "VISUAL",
+              "type": "string",
+              "enum": [
+                "VISUAL",
+                "TECHNICAL",
+                "SOCIAL",
+                "RESTRICTION"
+              ]
+            }
+          },
+          {
+            "name": "selfRating",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "SUCCESS",
+              "type": "string",
+              "enum": [
+                "FAILED",
+                "PARTIAL",
+                "SUCCESS"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 50,
+              "example": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor (last entry id from previous page)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated journal entries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "items": [
+                        {
+                          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                          "sessionId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                          "category": "VISUAL",
+                          "level": "BEGINNER",
+                          "note": "Great light today, caught some amazing shadows.",
+                          "selfRating": "SUCCESS",
+                          "hasPhoto": true,
+                          "createdAt": "2026-03-15T10:00:00.000Z",
+                          "updatedAt": "2026-03-15T10:00:00.000Z"
+                        }
+                      ],
+                      "nextCursor": null,
+                      "hasMore": false
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "List journal entries (cursor-based)",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/journal/stats": {
+      "get": {
+        "description": "Aggregated stats: total completed/skipped, streak, per-category and per-rating counts. Cached in Redis for 5 minutes.",
+        "operationId": "JournalController_getStats",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistics.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "totalCompleted": 12,
+                      "totalSkipped": 3,
+                      "currentStreak": 4,
+                      "longestStreak": 7,
+                      "byCategory": {
+                        "VISUAL": 5,
+                        "TECHNICAL": 3,
+                        "SOCIAL": 2,
+                        "RESTRICTION": 2
+                      },
+                      "byRating": {
+                        "SUCCESS": 8,
+                        "PARTIAL": 3,
+                        "FAILED": 1
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Journal statistics",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
+    "/journal/{id}": {
+      "get": {
+        "operationId": "JournalController_findOne",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Journal entry UUID",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Journal entry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "sessionId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "note": "Great light today, caught some amazing shadows.",
+                      "selfRating": "SUCCESS",
+                      "hasPhoto": true,
+                      "createdAt": "2026-03-15T10:00:00.000Z",
+                      "updatedAt": "2026-03-15T10:00:00.000Z"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Entry belongs to another user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "FORBIDDEN",
+                      "message": "Forbidden resource",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Entry not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "NOT_FOUND",
+                      "message": "Journal entry not found",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Get journal entry by ID",
+        "tags": [
+          "journal"
+        ]
+      },
+      "patch": {
+        "description": "Update note, selfRating, or hasPhoto.",
+        "operationId": "JournalController_update",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Journal entry UUID",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJournalEntryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Entry updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                      "sessionId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+                      "category": "VISUAL",
+                      "level": "BEGINNER",
+                      "note": "Great light today, caught some amazing shadows.",
+                      "selfRating": "SUCCESS",
+                      "hasPhoto": true,
+                      "createdAt": "2026-03-15T10:00:00.000Z",
+                      "updatedAt": "2026-03-15T10:00:00.000Z"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Entry not found."
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Update journal entry",
+        "tags": [
+          "journal"
+        ]
+      },
+      "delete": {
+        "operationId": "JournalController_remove",
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Locale: `en` (default) or `ru`",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Journal entry UUID",
+            "schema": {
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Entry deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "deleted": true
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Entry not found."
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Delete journal entry",
+        "tags": [
+          "journal"
+        ]
+      }
+    },
     "/users/me/push-token": {
       "post": {
         "description": "Saves an Expo push token for the current device. Call on login or when the app obtains a push token.",
@@ -2287,12 +2912,303 @@
           "subscriptions"
         ]
       }
+    },
+    "/promo/redeem": {
+      "post": {
+        "description": "Activates a promo code and grants lifetime Premium subscription.",
+        "operationId": "PromoController_redeem",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemPromoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Promo code redeemed. Returns updated subscription status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "isPremium": true,
+                      "plan": "premium",
+                      "expiresAt": "2099-12-31T23:59:59.000Z",
+                      "limits": {
+                        "tasksPerMonth": -1,
+                        "anotherTaskPerSession": 3,
+                        "journalEntriesVisible": -1
+                      }
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Promo code does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "PROMO_CODE_INVALID",
+                      "message": "PROMO_CODE_INVALID",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Code already used or user already premium.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "examples": [
+                    {
+                      "success": false,
+                      "error": {
+                        "code": "PROMO_CODE_ALREADY_USED",
+                        "message": "PROMO_CODE_ALREADY_USED",
+                        "details": []
+                      },
+                      "meta": {
+                        "timestamp": "2026-03-15T10:00:00.000Z"
+                      }
+                    },
+                    {
+                      "success": false,
+                      "error": {
+                        "code": "ALREADY_PREMIUM",
+                        "message": "ALREADY_PREMIUM",
+                        "details": []
+                      },
+                      "meta": {
+                        "timestamp": "2026-03-15T10:00:00.000Z"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Promo code expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "PROMO_CODE_EXPIRED",
+                      "message": "PROMO_CODE_EXPIRED",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "access-token": []
+          }
+        ],
+        "summary": "Redeem a promo code",
+        "tags": [
+          "promo"
+        ]
+      }
+    },
+    "/promo/generate": {
+      "post": {
+        "description": "Creates N promo codes. Requires X-Admin-Key header.",
+        "operationId": "PromoController_generate",
+        "parameters": [
+          {
+            "name": "X-Admin-Key",
+            "in": "header",
+            "description": "Admin API key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeneratePromoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Promo codes generated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": {
+                      "codes": [
+                        "K7X2NP4G",
+                        "M3L8YR5W"
+                      ],
+                      "count": 2,
+                      "expiresAt": "2026-12-31T23:59:59.000Z"
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid admin API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Invalid or missing admin API key",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Generate promo codes (admin)",
+        "tags": [
+          "promo"
+        ]
+      }
+    },
+    "/promo/list": {
+      "get": {
+        "description": "Returns all promo codes with optional status filter. Requires X-Admin-Key header.",
+        "operationId": "PromoController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "used",
+                "available",
+                "expired"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Admin-Key",
+            "in": "header",
+            "description": "Admin API key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of promo codes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": true,
+                    "data": [
+                      {
+                        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                        "code": "K7X2NP4G",
+                        "usedBy": null,
+                        "usedAt": null,
+                        "expiresAt": "2026-12-31T23:59:59.000Z",
+                        "createdAt": "2026-04-01T12:00:00.000Z"
+                      },
+                      {
+                        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                        "code": "M3L8YR5W",
+                        "usedBy": "user@example.com",
+                        "usedAt": "2026-04-05T15:30:00.000Z",
+                        "expiresAt": "2026-12-31T23:59:59.000Z",
+                        "createdAt": "2026-04-01T12:00:00.000Z"
+                      }
+                    ],
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid admin API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "success": false,
+                    "error": {
+                      "code": "TOKEN_INVALID",
+                      "message": "Invalid or missing admin API key",
+                      "details": []
+                    },
+                    "meta": {
+                      "timestamp": "2026-03-15T10:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List promo codes (admin)",
+        "tags": [
+          "promo"
+        ]
+      }
     }
   },
   "info": {
     "title": "StreetEye API",
     "description": "Backend API for the StreetEye mobile app — street photography assignments, journal, and badges.\n\n**Authentication:** All protected endpoints require `Authorization: Bearer \u003Caccess_token\u003E`.\n\n**Localisation:** Pass `Accept-Language: ru` or `Accept-Language: en` to get localised content (default: `en`).\n\n**Response format:** All responses are wrapped: `{ success, data, meta: { timestamp } }`.",
-    "version": "1.2",
+    "version": "1.4",
     "contact": {
 
     }
@@ -2321,6 +3237,10 @@
     {
       "name": "subscriptions",
       "description": "In-app purchase verification and Free/Premium status"
+    },
+    {
+      "name": "promo",
+      "description": "Promo code generation, redemption, and management"
     },
     {
       "name": "health",
@@ -2561,6 +3481,60 @@
           "status"
         ]
       },
+      "CreateJournalEntryDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "example": "c3d4e5f6-a7b8-9012-cdef-123456789012"
+          },
+          "note": {
+            "type": "string",
+            "example": "Great light today, caught some amazing shadows.",
+            "maxLength": 500
+          },
+          "selfRating": {
+            "type": "string",
+            "enum": [
+              "FAILED",
+              "PARTIAL",
+              "SUCCESS"
+            ],
+            "example": "SUCCESS"
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "sessionId",
+          "selfRating"
+        ]
+      },
+      "UpdateJournalEntryDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "example": "Updated note with reflection.",
+            "maxLength": 500
+          },
+          "selfRating": {
+            "type": "string",
+            "enum": [
+              "FAILED",
+              "PARTIAL",
+              "SUCCESS"
+            ],
+            "example": "PARTIAL"
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
       "SavePushTokenDto": {
         "type": "object",
         "properties": {
@@ -2604,6 +3578,39 @@
           "receipt",
           "platform",
           "productId"
+        ]
+      },
+      "RedeemPromoDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Promo code (8 characters, uppercase alphanumeric)",
+            "example": "K7X2NP4G"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "GeneratePromoDto": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "number",
+            "description": "Number of promo codes to generate",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Expiration date for the codes (ISO 8601)",
+            "example": "2026-12-31T23:59:59.000Z"
+          }
+        },
+        "required": [
+          "count",
+          "expiresAt"
         ]
       }
     }

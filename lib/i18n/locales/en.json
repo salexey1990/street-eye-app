@@ -105,6 +105,11 @@
       "PRO": "Pro"
     }
   },
+  "tabs": {
+    "task": "Task",
+    "journal": "Journal",
+    "profile": "Profile"
+  },
   "journal": {
     "title": "Journal",
     "empty": "No entries yet",

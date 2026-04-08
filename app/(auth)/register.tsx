@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
-import { authApi } from '@/lib/api/client';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function Register() {
   const router = useRouter();
@@ -43,11 +43,12 @@ export default function Register() {
     setLoading(true);
     setError(null);
     try {
-      await authApi.register({ email, password });
+      await useAuthStore.getState().register({ email, password });
       router.push('/(auth)/email-verify' as any);
     } catch (e: any) {
-      const code = e?.response?.data?.error?.message;
-      if (code === 'EMAIL_ALREADY_EXISTS') setError(t('auth.errors.emailAlreadyExists'));
+      const code = e?.response?.data?.error?.code;
+      if (code === 'CONFLICT') setError(t('auth.errors.emailAlreadyExists'));
+      else if (code === 'RATE_LIMIT_EXCEEDED') setError(t('auth.errors.rateLimitExceeded'));
       else setError(t('auth.errors.generic'));
     } finally {
       setLoading(false);

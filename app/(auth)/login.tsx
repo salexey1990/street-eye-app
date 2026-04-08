@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { theme } from '@/constants/theme';
-import { authApi } from '@/lib/api/client';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function Login() {
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function Login() {
     setLoading(true);
     setError(null);
     try {
-      await authApi.login({ email, password });
+      await useAuthStore.getState().login({ email, password });
       router.replace('/(tabs)');
     } catch (e: any) {
       const code = e?.response?.data?.error?.message;

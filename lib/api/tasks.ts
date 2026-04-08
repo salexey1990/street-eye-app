@@ -37,4 +37,22 @@ export const tasksApi = {
     });
     return res.data.data;
   },
+
+  async getAuthRandom(params: {
+    locale:  'ru' | 'en';
+    exclude?: string[];
+  }): Promise<Task> {
+    const res = await api.get('/tasks/random', {
+      headers: { 'Accept-Language': params.locale },
+      params: params.exclude?.length ? { exclude: params.exclude.join(',') } : undefined,
+    });
+    return res.data.data;
+  },
+
+  async getById(id: string, locale: 'ru' | 'en'): Promise<Task> {
+    const res = await api.get(`/tasks/${id}`, {
+      headers: { 'Accept-Language': locale },
+    });
+    return res.data.data;
+  },
 };
