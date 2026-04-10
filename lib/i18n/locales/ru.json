@@ -1,6 +1,7 @@
 {
   "common": {
     "continue": "Продолжить",
+    "save": "Сохранить",
     "or": "или",
     "retry": "Попробовать снова",
     "cancel": "Отмена",
@@ -123,6 +124,57 @@
     "task": "Задание",
     "journal": "Дневник",
     "profile": "Профиль"
+  },
+  "profile": {
+    "stats": {
+      "tasks": "заданий",
+      "streak": "серия",
+      "best": "дней"
+    },
+    "badges": {
+      "title": "Бейджи"
+    },
+    "premium": {
+      "description": "Все задания + полный дневник",
+      "cta": "Попробовать 7 дней бесплатно"
+    },
+    "settings": {
+      "title": "Настройки",
+      "language": "Язык",
+      "level": "Уровень",
+      "categories": "Категории",
+      "notifications": "Уведомления",
+      "reminderTime": "Время напоминания"
+    },
+    "level": {
+      "sheetTitle": "Изменить уровень"
+    },
+    "categories": {
+      "sheetTitle": "Изменить категории"
+    },
+    "account": {
+      "title": "Аккаунт",
+      "changePassword": "Изменить пароль",
+      "activatePromo": "Активировать промокод",
+      "deleteAccount": "Удалить аккаунт"
+    },
+    "password": {
+      "title": "Изменить пароль",
+      "current": "Текущий пароль",
+      "new": "Новый пароль",
+      "submit": "Сохранить",
+      "errorWrongCurrent": "Текущий пароль неверный",
+      "successTitle": "Готово",
+      "successBody": "Пароль успешно изменён"
+    },
+    "deleteAccount": {
+      "title": "Удалить аккаунт",
+      "body": "Все данные будут удалены без возможности восстановления. Продолжить?",
+      "confirm": "Удалить"
+    },
+    "notifications": {
+      "reminderBody": "Время выйти на улицу. Новое задание ждёт 📷"
+    }
   },
   "journal": {
     "title": "Дневник",

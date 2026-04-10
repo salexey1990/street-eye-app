@@ -1,6 +1,7 @@
 {
   "common": {
     "continue": "Continue",
+    "save": "Save",
     "or": "or",
     "retry": "Try again",
     "cancel": "Cancel",
@@ -123,6 +124,57 @@
     "task": "Task",
     "journal": "Journal",
     "profile": "Profile"
+  },
+  "profile": {
+    "stats": {
+      "tasks": "tasks",
+      "streak": "streak",
+      "best": "days"
+    },
+    "badges": {
+      "title": "Badges"
+    },
+    "premium": {
+      "description": "All tasks + full journal",
+      "cta": "Try free for 7 days"
+    },
+    "settings": {
+      "title": "Settings",
+      "language": "Language",
+      "level": "Level",
+      "categories": "Categories",
+      "notifications": "Notifications",
+      "reminderTime": "Reminder time"
+    },
+    "level": {
+      "sheetTitle": "Change level"
+    },
+    "categories": {
+      "sheetTitle": "Change categories"
+    },
+    "account": {
+      "title": "Account",
+      "changePassword": "Change password",
+      "activatePromo": "Activate promo code",
+      "deleteAccount": "Delete account"
+    },
+    "password": {
+      "title": "Change password",
+      "current": "Current password",
+      "new": "New password",
+      "submit": "Save",
+      "errorWrongCurrent": "Current password is incorrect",
+      "successTitle": "Done",
+      "successBody": "Password changed successfully"
+    },
+    "deleteAccount": {
+      "title": "Delete account",
+      "body": "All data will be permanently deleted. Continue?",
+      "confirm": "Delete"
+    },
+    "notifications": {
+      "reminderBody": "Time to go outside. A new task is waiting 📷"
+    }
   },
   "journal": {
     "title": "Journal",
