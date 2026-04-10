@@ -3,6 +3,7 @@
     "continue": "Continue",
     "or": "or",
     "retry": "Try again",
+    "cancel": "Cancel",
     "appTagline": "See the city differently"
   },
   "onboarding": {
@@ -128,6 +129,20 @@
     "empty": "No entries yet",
     "completed": "Completed",
     "streak": "Streak",
+    "newTitle": "Journal entry",
+    "editTitle": "Edit entry",
+    "ratingLabel": "How did it go?",
+    "noteLabel": "Note",
+    "notePlaceholder": "What worked, what didn't...",
+    "photoLabel": "Photo",
+    "addPhoto": "Add photo",
+    "photoPermission": "No access to photo library",
+    "save": "Save",
+    "skip": "Skip",
+    "close": "Close",
+    "unsavedTitle": "Entry not saved",
+    "unsavedBody": "Close without saving?",
+    "attachPhoto": "Attach photo",
     "ratings": {
       "failed": "Didn't work out",
       "partial": "Partial",

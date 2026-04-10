@@ -3,6 +3,7 @@
     "continue": "Продолжить",
     "or": "или",
     "retry": "Попробовать снова",
+    "cancel": "Отмена",
     "appTagline": "Видь город иначе"
   },
   "onboarding": {
@@ -128,6 +129,20 @@
     "empty": "Пока нет записей",
     "completed": "Выполнено",
     "streak": "Серия",
+    "newTitle": "Запись в дневник",
+    "editTitle": "Редактировать запись",
+    "ratingLabel": "Как прошло?",
+    "noteLabel": "Заметка",
+    "notePlaceholder": "Что получилось, что нет...",
+    "photoLabel": "Фото",
+    "addPhoto": "Добавить фото",
+    "photoPermission": "Нет доступа к галерее",
+    "save": "Сохранить",
+    "skip": "Пропустить",
+    "close": "Закрыть",
+    "unsavedTitle": "Запись не сохранена",
+    "unsavedBody": "Закрыть без сохранения?",
+    "attachPhoto": "Прикрепить фото",
     "ratings": {
       "failed": "Не получилось",
       "partial": "Частично",

@@ -18,6 +18,7 @@ import { theme } from '@/constants/theme';
 import { useTaskStore } from '@/store/task.store';
 import { Task } from '@/lib/api/tasks';
 import { RegisterSheet } from '@/components/auth/RegisterSheet';
+import { JournalEntrySheet } from '@/components/journal/JournalEntrySheet';
 
 // ─── Timer ────────────────────────────────────────────────────────────────────
 
@@ -81,6 +82,9 @@ export default function TaskScreen() {
   const [isGuest,        setIsGuest]        = useState<boolean | null>(null);
   const [showTimer,      setShowTimer]       = useState(false);
   const [showRegSheet, setShowRegSheet] = useState(false);
+  const [journalSheet, setJournalSheet] = useState<{
+    sessionId: string; taskId: string; taskTitle: string; taskCategory: string;
+  } | null>(null);
 
   // Determine auth state and load initial task
   useEffect(() => {
@@ -125,12 +129,24 @@ export default function TaskScreen() {
       setShowRegSheet(true);
       return;
     }
+    // Capture task data before closing session (closeSession clears it)
+    const task = store.activeTask;
+    const sessionId = store.activeSessionId;
+    if (!task || !sessionId) return;
+
+    await timer.stop();
     try {
-      await timer.stop();
       await store.closeSession('COMPLETED');
     } catch {
-      Alert.alert(t('common.error', { defaultValue: 'Ошибка' }), t('auth.errors.generic'));
+      // API may fail — still open journal sheet (offline-first)
     }
+    // Always open journal entry sheet with captured data
+    setJournalSheet({
+      sessionId,
+      taskId:       task.id,
+      taskTitle:    task.title,
+      taskCategory: task.category,
+    });
   };
 
   const handleSaveLater = async () => {
@@ -214,6 +230,18 @@ export default function TaskScreen() {
           onClose={() => setShowRegSheet(false)}
           onSuccess={handleRegisterSuccess}
         />
+
+        {journalSheet && (
+          <JournalEntrySheet
+            visible={!!journalSheet}
+            sessionId={journalSheet.sessionId}
+            taskId={journalSheet.taskId}
+            taskTitle={journalSheet.taskTitle}
+            taskCategory={journalSheet.taskCategory}
+            onSaved={() => setJournalSheet(null)}
+            onSkip={() => setJournalSheet(null)}
+          />
+        )}
       </SafeAreaView>
     );
   }
@@ -309,6 +337,18 @@ export default function TaskScreen() {
         onClose={() => setShowRegSheet(false)}
         onSuccess={handleRegisterSuccess}
       />
+
+      {journalSheet && (
+        <JournalEntrySheet
+          visible={!!journalSheet}
+          sessionId={journalSheet.sessionId}
+          taskId={journalSheet.taskId}
+          taskTitle={journalSheet.taskTitle}
+          taskCategory={journalSheet.taskCategory}
+          onSaved={() => setJournalSheet(null)}
+          onSkip={() => setJournalSheet(null)}
+        />
+      )}
     </SafeAreaView>
   );
 }

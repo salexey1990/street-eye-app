@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.street-eye-app"
+      "bundleIdentifier": "com.anonymous.street-eye-app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "StreetEye использует галерею для прикрепления фото к записям дневника."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -41,7 +44,14 @@
         }
       ],
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "StreetEye использует галерею для прикрепления фото к записям дневника."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
