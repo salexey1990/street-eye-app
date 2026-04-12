@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { theme } from '@/constants/theme';
 import { useAuthStore } from '@/store/auth.store';
 import { useProfileStore, toUI, toBackend } from '@/store/profile.store';
+import { useJournalStore } from '@/store/journal.store';
 import { LevelSheet } from '@/components/profile/LevelSheet';
 import { CategoriesSheet } from '@/components/profile/CategoriesSheet';
 import { ChangePasswordSheet } from '@/components/profile/ChangePasswordSheet';
@@ -101,6 +102,7 @@ export default function ProfileScreen() {
   const logout       = useAuthStore((s) => s.logout);
   const { user, stats, badges, loading, notificationsEnabled, reminderTime, load, updateUser, setNotifications, clear } =
     useProfileStore();
+  const clearJournal = useJournalStore((s) => s.clear);
 
   const [levelSheet,    setLevelSheet]    = useState(false);
   const [catSheet,      setCatSheet]      = useState(false);
@@ -116,6 +118,7 @@ export default function ProfileScreen() {
   const handleLogout = async () => {
     await logout();
     clear();
+    clearJournal();
     router.replace('/(auth)/login');
   };
 
@@ -132,6 +135,7 @@ export default function ProfileScreen() {
             try {
               await useProfileStore.getState().deleteAccount();
               await logout();
+              clearJournal();
               router.replace('/(auth)/login');
             } catch {
               Alert.alert(t('auth.errors.generic'));
@@ -346,6 +350,7 @@ export default function ProfileScreen() {
             onPress={async () => {
               await logout();
               clear();
+              clearJournal();
               await AsyncStorage.multiRemove(['onboarding_complete', 'onboarding_data', 'guest_active_task', 'locale']);
               router.replace('/(onboarding)/welcome');
             }}

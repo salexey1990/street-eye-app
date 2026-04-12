@@ -4,9 +4,9 @@ import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
 import i18n from '@/lib/i18n';
 import { theme } from '@/constants/theme';
+import { useAuthStore } from '@/store/auth.store';
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
@@ -25,13 +25,10 @@ export default function RootLayout() {
       if (!onboardingDone) {
         setInitialRoute('(onboarding)');
       } else {
-        const refreshToken = await SecureStore.getItemAsync('refresh_token');
-        if (refreshToken) {
-          setInitialRoute('(tabs)');
-        } else {
-          // Onboarding done but not logged in — go to tabs as guest
-          setInitialRoute('(tabs)');
-        }
+        // Restore session (no-op if no refresh_token) so userId is in the
+        // store before any tab screen mounts and calls load().
+        await useAuthStore.getState().restoreSession();
+        setInitialRoute('(tabs)');
       }
 
       setIsReady(true);

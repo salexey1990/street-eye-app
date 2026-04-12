@@ -13,6 +13,7 @@ export interface JournalEntry {
   has_photo:     boolean;
   photo_uri:     string | null;
   created_at:    string;
+  user_id:       string;
   synced:        boolean;
 }
 
@@ -37,14 +38,20 @@ async function getDb(): Promise<SQLite.SQLiteDatabase> {
       synced        INTEGER DEFAULT 0
     );
   `);
+  // Migration: add user_id column if it does not exist yet.
+  // Existing rows receive '' — they won't surface for any real user.
+  await _db
+    .execAsync(`ALTER TABLE journal_entries ADD COLUMN user_id TEXT NOT NULL DEFAULT '';`)
+    .catch(() => {}); // SQLite throws if column already exists — safe to ignore
   return _db;
 }
 
 export const journalDb = {
-  async getAll(): Promise<JournalEntry[]> {
+  async getAll(userId: string): Promise<JournalEntry[]> {
     const db = await getDb();
     const rows = await db.getAllAsync<Record<string, unknown>>(
-      'SELECT * FROM journal_entries ORDER BY created_at DESC',
+      'SELECT * FROM journal_entries WHERE user_id = ? ORDER BY created_at DESC',
+      [userId],
     );
     return rows.map(mapRow);
   },
@@ -62,8 +69,8 @@ export const journalDb = {
     const db = await getDb();
     await db.runAsync(
       `INSERT INTO journal_entries
-        (id, session_id, task_id, task_title, task_category, note, self_rating, has_photo, photo_uri, created_at, synced)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+        (id, session_id, task_id, task_title, task_category, note, self_rating, has_photo, photo_uri, created_at, user_id, synced)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
       [
         entry.id,
         entry.session_id,
@@ -75,6 +82,7 @@ export const journalDb = {
         entry.has_photo ? 1 : 0,
         entry.photo_uri ?? null,
         entry.created_at,
+        entry.user_id,
       ],
     );
   },
@@ -108,10 +116,22 @@ export const journalDb = {
     await db.runAsync('DELETE FROM journal_entries WHERE id = ?', [id]);
   },
 
-  async getPending(): Promise<JournalEntry[]> {
+  // Reassign entries that were created before user_id tracking (user_id='')
+  // to the current user. Safe on single-user devices; on shared devices
+  // orphaned rows belong to whoever logs in next.
+  async claimOrphaned(userId: string): Promise<void> {
+    const db = await getDb();
+    await db.runAsync(
+      "UPDATE journal_entries SET user_id = ? WHERE user_id = ''",
+      [userId],
+    );
+  },
+
+  async getPending(userId: string): Promise<JournalEntry[]> {
     const db = await getDb();
     const rows = await db.getAllAsync<Record<string, unknown>>(
-      'SELECT * FROM journal_entries WHERE synced = 0',
+      'SELECT * FROM journal_entries WHERE synced = 0 AND user_id = ?',
+      [userId],
     );
     return rows.map(mapRow);
   },
@@ -129,6 +149,7 @@ function mapRow(row: Record<string, unknown>): JournalEntry {
     has_photo:     Number(row.has_photo) === 1,
     photo_uri:     (row.photo_uri as string | null) ?? null,
     created_at:    row.created_at as string,
+    user_id:       (row.user_id as string) ?? '',
     synced:        Number(row.synced) === 1,
   };
 }

@@ -3,6 +3,11 @@ import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import { journalDb, JournalEntry, SelfRating } from '@/lib/db/journal';
 import { journalApi, JournalStats } from '@/lib/api/journal';
+import { useAuthStore } from '@/store/auth.store';
+
+function currentUserId(): string {
+  return useAuthStore.getState().userId ?? '';
+}
 
 interface JournalState {
   entries: JournalEntry[];
@@ -26,6 +31,7 @@ interface JournalState {
     photoUri?:   string | null;
   }) => Promise<void>;
   deleteEntry:   (id: string) => Promise<void>;
+  clear:         () => void;
 }
 
 export const useJournalStore = create<JournalState>((set, get) => ({
@@ -35,9 +41,14 @@ export const useJournalStore = create<JournalState>((set, get) => ({
 
   async load() {
     set({ loading: true });
+    const userId = currentUserId();
     try {
+      // Re-claim entries that were saved before user_id tracking was added
+      // (they have user_id=''). Must run before getAll so they're visible.
+      if (userId) await journalDb.claimOrphaned(userId);
+
       // Always read from SQLite first (offline support)
-      const local = await journalDb.getAll();
+      const local = await journalDb.getAll(userId);
       set({ entries: local });
 
       // Fetch remote if authenticated
@@ -64,11 +75,12 @@ export const useJournalStore = create<JournalState>((set, get) => ({
                 has_photo:     e.hasPhoto,
                 photo_uri:     null,
                 created_at:    e.createdAt,
+                user_id:       userId,
               });
               await journalDb.markSynced(e.id);
             }
           }
-          const updated = await journalDb.getAll();
+          const updated = await journalDb.getAll(userId);
           set({ entries: updated });
         }
       }
@@ -81,7 +93,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
     const rt = await SecureStore.getItemAsync('refresh_token');
     if (!rt) return;
 
-    const pending = await journalDb.getPending();
+    const pending = await journalDb.getPending(currentUserId());
     for (const entry of pending) {
       try {
         await journalApi.create({
@@ -112,6 +124,7 @@ export const useJournalStore = create<JournalState>((set, get) => ({
       has_photo:     !!photoUri,
       photo_uri:     photoUri ?? null,
       created_at,
+      user_id:       currentUserId(),
       synced:        false,
     };
 
@@ -190,5 +203,9 @@ export const useJournalStore = create<JournalState>((set, get) => ({
     if (rt) {
       journalApi.delete(id).catch(() => {});
     }
+  },
+
+  clear() {
+    set({ entries: [], stats: null, loading: false });
   },
 }));
