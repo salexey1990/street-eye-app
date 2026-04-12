@@ -54,6 +54,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)/login"        options={{ headerShown: false }} />
         <Stack.Screen name="(onboarding)"        options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)"              options={{ headerShown: false }} />
+        <Stack.Screen name="paywall"             options={{ headerShown: false, presentation: 'modal' }} />
       </Stack>
       <StatusBar style="light" />
     </ThemeProvider>

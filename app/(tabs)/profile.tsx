@@ -21,6 +21,7 @@ import { useProfileStore, toUI, toBackend } from '@/store/profile.store';
 import { LevelSheet } from '@/components/profile/LevelSheet';
 import { CategoriesSheet } from '@/components/profile/CategoriesSheet';
 import { ChangePasswordSheet } from '@/components/profile/ChangePasswordSheet';
+import { PromoCodeSheet } from '@/components/profile/PromoCodeSheet';
 import i18n from '@/lib/i18n';
 
 type Level    = 'BEGINNER' | 'INTERMEDIATE' | 'PRO';
@@ -104,6 +105,7 @@ export default function ProfileScreen() {
   const [levelSheet,    setLevelSheet]    = useState(false);
   const [catSheet,      setCatSheet]      = useState(false);
   const [pwSheet,       setPwSheet]       = useState(false);
+  const [promoSheet,    setPromoSheet]    = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -255,7 +257,7 @@ export default function ProfileScreen() {
               <Text style={s.premiumTitle}>Premium</Text>
               <Text style={s.premiumSub}>{t('profile.premium.description')}</Text>
             </View>
-            <TouchableOpacity style={s.premiumBtn} activeOpacity={0.8}>
+            <TouchableOpacity style={s.premiumBtn} activeOpacity={0.8} onPress={() => router.push('/paywall')}>
               <Text style={s.premiumBtnText}>{t('profile.premium.cta')}</Text>
             </TouchableOpacity>
           </View>
@@ -325,7 +327,7 @@ export default function ProfileScreen() {
               onPress={() => setPwSheet(true)}
             />
             {!user?.isPremium && (
-              <TouchableOpacity style={s.promoRow} activeOpacity={0.8}>
+              <TouchableOpacity style={s.promoRow} activeOpacity={0.8} onPress={() => setPromoSheet(true)}>
                 <Ionicons name="pricetag-outline" size={20} color={theme.colors.accent} />
                 <Text style={s.promoText}>{t('profile.account.activatePromo')}</Text>
               </TouchableOpacity>
@@ -342,6 +344,8 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={s.devBtn}
             onPress={async () => {
+              await logout();
+              clear();
               await AsyncStorage.multiRemove(['onboarding_complete', 'onboarding_data', 'guest_active_task', 'locale']);
               router.replace('/(onboarding)/welcome');
             }}
@@ -370,6 +374,14 @@ export default function ProfileScreen() {
         onSuccess={() => {
           setPwSheet(false);
           Alert.alert(t('profile.password.successTitle'), t('profile.password.successBody'));
+        }}
+      />
+      <PromoCodeSheet
+        visible={promoSheet}
+        onClose={() => setPromoSheet(false)}
+        onSuccess={() => {
+          setPromoSheet(false);
+          load(); // Refresh profile to show Premium status
         }}
       />
     </SafeAreaView>

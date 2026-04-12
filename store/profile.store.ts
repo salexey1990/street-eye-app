@@ -25,6 +25,7 @@ interface ProfileState {
   changePassword:   (current: string, next: string) => Promise<void>;
   deleteAccount:    () => Promise<void>;
   setNotifications: (enabled: boolean, time?: string) => Promise<void>;
+  setUser:          (user: UserProfile) => void;
   clear:            () => void;
 }
 
@@ -142,6 +143,10 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
 
     set({ notificationsEnabled: enabled, reminderTime: newTime });
+  },
+
+  setUser(user) {
+    set({ user });
   },
 
   clear() {

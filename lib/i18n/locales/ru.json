@@ -108,6 +108,10 @@
     "statusActive": "Активное задание",
     "emptyTitle": "Нет активного задания",
     "emptySubtitle": "Нажмите кнопку, чтобы получить задание",
+    "limitTitle": "Лимит заданий исчерпан",
+    "limitCounter": "{{count}} / {{total}} заданий в этом месяце",
+    "limitReset": "Обновится {{date}}",
+    "goPremium": "Перейти на Premium",
     "categories": {
       "VISUAL": "Визуальное",
       "TECHNICAL": "Техническое",
@@ -124,6 +128,41 @@
     "task": "Задание",
     "journal": "Дневник",
     "profile": "Профиль"
+  },
+  "paywall": {
+    "title": "StreetEye Premium",
+    "subtitle": "Снимай без ограничений",
+    "features": {
+      "unlimited": "Неограниченное количество заданий в месяц",
+      "swaps": "До 3 смен задания за сессию",
+      "journal": "Полная история дневника без ограничений",
+      "reminders": "Персональные напоминания и уведомления"
+    },
+    "price": "$3.99",
+    "period": "/ мес",
+    "trial": "7 дней бесплатно",
+    "cta": "Попробовать бесплатно",
+    "cancelNote": "Отменить можно в любой момент",
+    "restore": "Восстановить покупку",
+    "havePromo": "Есть промокод?",
+    "enterPromo": "Ввести промокод",
+    "restoreSuccess": "Подписка восстановлена!",
+    "restoreNotFound": "Активных покупок не найдено",
+    "iapUnavailableTitle": "IAP не настроен",
+    "iapUnavailableBody": "In-App Purchases ещё не подключены. Используйте промокод."
+  },
+  "promo": {
+    "title": "Промокод",
+    "subtitle": "Введите код для активации Premium",
+    "placeholder": "XXXXXXXX",
+    "activate": "Активировать",
+    "successTitle": "Premium активирован!",
+    "errors": {
+      "PROMO_CODE_INVALID": "Промокод не найден",
+      "PROMO_CODE_ALREADY_USED": "Этот промокод уже использован",
+      "PROMO_CODE_EXPIRED": "Срок действия промокода истёк",
+      "ALREADY_PREMIUM": "У вас уже есть Premium-подписка"
+    }
   },
   "profile": {
     "stats": {

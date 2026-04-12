@@ -108,6 +108,10 @@
     "statusActive": "Active task",
     "emptyTitle": "No active task",
     "emptySubtitle": "Tap the button to get a task",
+    "limitTitle": "Monthly task limit reached",
+    "limitCounter": "{{count}} / {{total}} tasks this month",
+    "limitReset": "Resets on {{date}}",
+    "goPremium": "Go Premium",
     "categories": {
       "VISUAL": "Visual",
       "TECHNICAL": "Technical",
@@ -124,6 +128,41 @@
     "task": "Task",
     "journal": "Journal",
     "profile": "Profile"
+  },
+  "paywall": {
+    "title": "StreetEye Premium",
+    "subtitle": "Shoot without limits",
+    "features": {
+      "unlimited": "Unlimited tasks per month",
+      "swaps": "Up to 3 task swaps per session",
+      "journal": "Full journal history with no restrictions",
+      "reminders": "Personalised reminders and notifications"
+    },
+    "price": "$3.99",
+    "period": "/ mo",
+    "trial": "7 days free",
+    "cta": "Try free",
+    "cancelNote": "Cancel anytime",
+    "restore": "Restore purchase",
+    "havePromo": "Have a promo code?",
+    "enterPromo": "Enter promo code",
+    "restoreSuccess": "Subscription restored!",
+    "restoreNotFound": "No active purchases found",
+    "iapUnavailableTitle": "IAP not configured",
+    "iapUnavailableBody": "In-App Purchases are not set up yet. Use a promo code instead."
+  },
+  "promo": {
+    "title": "Promo code",
+    "subtitle": "Enter a code to activate Premium",
+    "placeholder": "XXXXXXXX",
+    "activate": "Activate",
+    "successTitle": "Premium activated!",
+    "errors": {
+      "PROMO_CODE_INVALID": "Promo code not found",
+      "PROMO_CODE_ALREADY_USED": "This promo code has already been used",
+      "PROMO_CODE_EXPIRED": "This promo code has expired",
+      "ALREADY_PREMIUM": "You already have a Premium subscription"
+    }
   },
   "profile": {
     "stats": {

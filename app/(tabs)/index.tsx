@@ -12,10 +12,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { theme } from '@/constants/theme';
 import { useTaskStore } from '@/store/task.store';
+import { useSubscriptionStore, FREE_MONTHLY_LIMIT } from '@/store/subscription.store';
+import { profileApi } from '@/lib/api/profile';
 import { Task } from '@/lib/api/tasks';
 import { RegisterSheet } from '@/components/auth/RegisterSheet';
 import { JournalEntrySheet } from '@/components/journal/JournalEntrySheet';
@@ -76,8 +79,10 @@ function useTimer() {
 
 export default function TaskScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const store = useTaskStore();
   const timer = useTimer();
+  const sub   = useSubscriptionStore();
 
   const [isGuest,        setIsGuest]        = useState<boolean | null>(null);
   const [showTimer,      setShowTimer]       = useState(false);
@@ -86,11 +91,20 @@ export default function TaskScreen() {
     sessionId: string; taskId: string; taskTitle: string; taskCategory: string;
   } | null>(null);
 
-  // Determine auth state and load initial task
+  // Determine auth state, load subscription info, then load initial task
   useEffect(() => {
     (async () => {
       const rt = await SecureStore.getItemAsync('refresh_token');
-      setIsGuest(!rt);
+      const guest = !rt;
+      setIsGuest(guest);
+      if (!guest) {
+        try {
+          const res = await profileApi.getProfile();
+          await sub.loadFromProfile(res.data.data.isPremium);
+        } catch {
+          // Best-effort — continue without premium check
+        }
+      }
       await store.loadInitialTask();
     })();
   }, []);
@@ -107,8 +121,15 @@ export default function TaskScreen() {
   // ─── Actions ────────────────────────────────────────────────────────────────
 
   const handleGetTask = async () => {
+    if (sub.isAtMonthlyLimit()) {
+      router.push('/paywall');
+      return;
+    }
     store.clearPreview();
     await store.fetchPreview();
+    if (useTaskStore.getState().error === 'MONTHLY_LIMIT_REACHED') {
+      router.push('/paywall');
+    }
   };
 
   const handleTakeTask = async () => {
@@ -246,6 +267,27 @@ export default function TaskScreen() {
     );
   }
 
+  // ─── State C — monthly limit reached ─────────────────────────────────────
+  if (!hasActive && !hasPreviw && !isGuest && sub.isAtMonthlyLimit()) {
+    const resetDate = sub.monthResetDate;
+    return (
+      <SafeAreaView style={s.container}>
+        <Header />
+        <View style={s.center}>
+          <Ionicons name="lock-closed-outline" size={56} color={theme.colors.iconMuted} />
+          <Text style={s.emptyTitle}>{t('task.limitTitle')}</Text>
+          <Text style={s.emptySubtitle}>
+            {t('task.limitCounter', { count: FREE_MONTHLY_LIMIT, total: FREE_MONTHLY_LIMIT })}
+          </Text>
+          <Text style={s.limitReset}>{t('task.limitReset', { date: resetDate })}</Text>
+          <TouchableOpacity style={s.paywallBtn} activeOpacity={0.8} onPress={() => router.push('/paywall')}>
+            <Text style={s.paywallBtnText}>{t('task.goPremium')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   // ─── State B — preview / no task ──────────────────────────────────────────
   return (
     <SafeAreaView style={s.container}>
@@ -279,7 +321,7 @@ export default function TaskScreen() {
       </ScrollView>
 
       {/* Error */}
-      {store.error && (
+      {store.error && store.error !== 'MONTHLY_LIMIT_REACHED' && (
         <Text style={s.errorText}>
           {store.error === 'RATE_LIMIT_EXCEEDED'
             ? t('auth.errors.rateLimitExceeded')
@@ -511,6 +553,11 @@ const s = StyleSheet.create({
 
   // Swap counter
   swapCounter:      { ...theme.font.bodySmall, color: theme.colors.textMuted, textAlign: 'center', fontFamily: theme.font.family },
+
+  // State C — limit
+  limitReset:       { ...theme.font.bodySmall, color: theme.colors.textMuted, textAlign: 'center', fontFamily: theme.font.family },
+  paywallBtn:       { backgroundColor: theme.colors.accent, borderRadius: theme.radius.pill, paddingHorizontal: theme.spacing.xl, paddingVertical: theme.spacing.md, marginTop: theme.spacing.sm },
+  paywallBtnText:   { ...theme.font.button, color: theme.colors.text, fontFamily: theme.font.family },
 
   // Error
   errorText:        { ...theme.font.bodySmall, color: '#FF6B6B', textAlign: 'center', paddingHorizontal: theme.spacing.lg, fontFamily: theme.font.family },

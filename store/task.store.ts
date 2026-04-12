@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import i18n from '@/lib/i18n';
 import { Task, tasksApi } from '@/lib/api/tasks';
 import { sessionsApi } from '@/lib/api/sessions';
+import { useSubscriptionStore } from '@/store/subscription.store';
 
 type SessionStatus = 'COMPLETED' | 'SKIPPED' | 'SAVED_FOR_LATER';
 
@@ -30,7 +31,7 @@ interface TaskState {
   clearError:       () => void;
 }
 
-const MAX_SWAPS_AUTH = 3;
+const MAX_SWAPS_AUTH = 3; // Premium; Free is 1 — resolved from subscriptionStore at session start
 
 export const useTaskStore = create<TaskState>((set, get) => ({
   previewTask:     null,
@@ -43,7 +44,9 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   MAX_SWAPS:       MAX_SWAPS_AUTH,
 
   async loadInitialTask() {
-    set({ loading: true, error: null });
+    // Set swaps based on current subscription tier
+    const swaps = useSubscriptionStore.getState().swapsPerSession();
+    set({ loading: true, error: null, swapsLeft: swaps, MAX_SWAPS: swaps });
     const locale = i18n.language as 'ru' | 'en';
 
     try {
@@ -90,6 +93,12 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   async fetchPreview() {
     const { swapsLeft } = get();
     if (swapsLeft <= 0) return;
+    // Monthly limit check (authenticated only)
+    const sub = useSubscriptionStore.getState();
+    if (sub.isAtMonthlyLimit()) {
+      set({ error: 'MONTHLY_LIMIT_REACHED' });
+      return;
+    }
 
     set({ loading: true, error: null });
     const locale = i18n.language as 'ru' | 'en';
@@ -120,6 +129,8 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const session = await sessionsApi.create(taskId);
     const { previewTask } = get();
     set({ activeTask: previewTask, activeSessionId: session.id, previewTask: null });
+    // Increment monthly counter
+    await useSubscriptionStore.getState().incrementTaskCount();
     return session.id;
   },
 
@@ -130,12 +141,14 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     }
     // Clear guest task if any
     await AsyncStorage.removeItem('guest_active_task');
+    const swaps = useSubscriptionStore.getState().swapsPerSession();
     set({
       activeTask:      null,
       activeSessionId: null,
       guestTask:       null,
       previewTask:     null,
-      swapsLeft:       MAX_SWAPS_AUTH,
+      swapsLeft:       swaps,
+      MAX_SWAPS:       swaps,
     });
   },
 
