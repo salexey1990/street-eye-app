@@ -2,6 +2,9 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 
+// [MONETIZATION] Set to true to enable monetization at launch
+const MONETIZATION_ENABLED = false;
+
 const FREE_MONTHLY_LIMIT       = 10;
 const FREE_SWAPS_PER_SESSION   = 1;
 const PREMIUM_SWAPS_PER_SESSION = 3;
@@ -40,11 +43,15 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   userId:         null,
 
   isAtMonthlyLimit: () => {
+    if (!MONETIZATION_ENABLED) return false; // [MONETIZATION]
     const { isPremium, tasksThisMonth } = get();
     return !isPremium && tasksThisMonth >= FREE_MONTHLY_LIMIT;
   },
 
-  swapsPerSession: () => (get().isPremium ? PREMIUM_SWAPS_PER_SESSION : FREE_SWAPS_PER_SESSION),
+  swapsPerSession: () => {
+    if (!MONETIZATION_ENABLED) return PREMIUM_SWAPS_PER_SESSION; // [MONETIZATION]
+    return get().isPremium ? PREMIUM_SWAPS_PER_SESSION : FREE_SWAPS_PER_SESSION;
+  },
 
   async loadFromProfile(isPremium) {
     // userId is written to SecureStore during login / restoreSession
@@ -59,6 +66,7 @@ export const useSubscriptionStore = create<SubscriptionState>((set, get) => ({
   },
 
   async incrementTaskCount() {
+    if (!MONETIZATION_ENABLED) return; // [MONETIZATION]
     if (get().isPremium) return;
     const userId = get().userId ?? 'unknown';
     const key  = monthKey(userId);

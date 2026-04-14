@@ -123,15 +123,15 @@ export default function TaskScreen() {
   // ─── Actions ────────────────────────────────────────────────────────────────
 
   const handleGetTask = async () => {
-    if (sub.isAtMonthlyLimit()) {
-      router.push('/paywall');
-      return;
-    }
+    if (sub.isAtMonthlyLimit()) { // [MONETIZATION]
+      router.push('/paywall');    // [MONETIZATION]
+      return;                     // [MONETIZATION]
+    }                             // [MONETIZATION]
     store.clearPreview();
     await store.fetchPreview();
-    if (useTaskStore.getState().error === 'MONTHLY_LIMIT_REACHED') {
-      router.push('/paywall');
-    }
+    if (useTaskStore.getState().error === 'MONTHLY_LIMIT_REACHED') { // [MONETIZATION]
+      router.push('/paywall');                                        // [MONETIZATION]
+    }                                                                 // [MONETIZATION]
   };
 
   const handleTakeTask = async () => {
@@ -270,7 +270,7 @@ export default function TaskScreen() {
     );
   }
 
-  // ─── State C — monthly limit reached ─────────────────────────────────────
+  // [MONETIZATION] State C — monthly limit reached (unreachable while MONETIZATION_ENABLED=false)
   if (!hasActive && !hasPreviw && !isGuest && sub.isAtMonthlyLimit()) {
     const resetDate = sub.monthResetDate;
     return (
@@ -334,7 +334,7 @@ export default function TaskScreen() {
       </ScrollView>
 
       {/* Error */}
-      {store.error && store.error !== 'MONTHLY_LIMIT_REACHED' && (
+      {store.error && store.error !== 'MONTHLY_LIMIT_REACHED' && ( // [MONETIZATION] MONTHLY_LIMIT_REACHED check
         <Text style={s.errorText}>
           {store.error === 'RATE_LIMIT_EXCEEDED'
             ? t('auth.errors.rateLimitExceeded')

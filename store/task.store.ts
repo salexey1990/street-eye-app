@@ -130,8 +130,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     const session = await sessionsApi.create(taskId);
     const { previewTask } = get();
     set({ activeTask: previewTask, activeSessionId: session.id, previewTask: null });
-    // Increment monthly counter
-    await useSubscriptionStore.getState().incrementTaskCount();
+    await useSubscriptionStore.getState().incrementTaskCount(); // [MONETIZATION]
     return session.id;
   },
 
@@ -152,7 +151,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       previewTask:     null,
       guestTask:       null,
     });
-    await useSubscriptionStore.getState().incrementTaskCount();
+    await useSubscriptionStore.getState().incrementTaskCount(); // [MONETIZATION]
   },
 
   async closeSession(status) {
