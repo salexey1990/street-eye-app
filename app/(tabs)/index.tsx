@@ -22,6 +22,7 @@ import { profileApi } from '@/lib/api/profile';
 import { Task } from '@/lib/api/tasks';
 import { RegisterSheet } from '@/components/auth/RegisterSheet';
 import { JournalEntrySheet } from '@/components/journal/JournalEntrySheet';
+import { SavedTasksList } from '@/components/task/SavedTasksList';
 
 // ─── Timer ────────────────────────────────────────────────────────────────────
 
@@ -86,7 +87,8 @@ export default function TaskScreen() {
 
   const [isGuest,        setIsGuest]        = useState<boolean | null>(null);
   const [showTimer,      setShowTimer]       = useState(false);
-  const [showRegSheet, setShowRegSheet] = useState(false);
+  const [showRegSheet,   setShowRegSheet]    = useState(false);
+  const [savedListKey,   setSavedListKey]    = useState(0);
   const [journalSheet, setJournalSheet] = useState<{
     sessionId: string; taskId: string; taskTitle: string; taskCategory: string;
   } | null>(null);
@@ -177,6 +179,7 @@ export default function TaskScreen() {
     }
     try {
       await store.closeSession('SAVED_FOR_LATER');
+      setSavedListKey(k => k + 1);
     } catch {
       Alert.alert(t('common.error', { defaultValue: 'Ошибка' }), t('auth.errors.generic'));
     }
@@ -293,6 +296,16 @@ export default function TaskScreen() {
     <SafeAreaView style={s.container}>
       <Header />
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+
+        {/* Saved for later section — only when no task is displayed */}
+        {!isGuest && !displayTask && (
+          <SavedTasksList
+            key={savedListKey}
+            onResumed={() => {
+              setSavedListKey(k => k + 1);
+            }}
+          />
+        )}
 
         {displayTask ? (
           <>
@@ -547,7 +560,7 @@ const s = StyleSheet.create({
   timerStopText:    { ...theme.font.link, color: '#FF6B6B', fontFamily: theme.font.family },
 
   // Empty state
-  emptyState:       { flex: 1, alignItems: 'center', justifyContent: 'center', gap: theme.spacing.md, paddingTop: 80 },
+  emptyState:       { alignItems: 'center', gap: theme.spacing.md, paddingTop: 80, paddingBottom: theme.spacing.xl },
   emptyTitle:       { ...theme.font.displaySm, fontWeight: '600', color: theme.colors.text, textAlign: 'center', fontFamily: theme.font.family },
   emptySubtitle:    { ...theme.font.body, color: theme.colors.textMuted, textAlign: 'center', fontFamily: theme.font.family },
 

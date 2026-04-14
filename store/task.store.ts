@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import i18n from '@/lib/i18n';
 import { Task, tasksApi } from '@/lib/api/tasks';
-import { sessionsApi } from '@/lib/api/sessions';
+import { SavedSession, sessionsApi } from '@/lib/api/sessions';
 import { useSubscriptionStore } from '@/store/subscription.store';
 
 type SessionStatus = 'COMPLETED' | 'SKIPPED' | 'SAVED_FOR_LATER';
@@ -26,6 +26,7 @@ interface TaskState {
   loadInitialTask:  () => Promise<void>;
   fetchPreview:     () => Promise<void>;
   acceptTask:       (taskId: string) => Promise<string>; // returns sessionId
+  resumeSavedTask:  (saved: SavedSession) => Promise<void>;
   closeSession:     (status: SessionStatus) => Promise<void>;
   clearPreview:     () => void;
   clearError:       () => void;
@@ -134,10 +135,34 @@ export const useTaskStore = create<TaskState>((set, get) => ({
     return session.id;
   },
 
+  async resumeSavedTask(saved) {
+    const session = await sessionsApi.create(saved.taskId);
+    set({
+      activeTask: {
+        id:           saved.taskId,
+        title:        saved.title,
+        description:  saved.description,
+        tip:          saved.tip,
+        category:     saved.category as Task['category'],
+        level:        saved.level as Task['level'],
+        durationMins: saved.durationMins,
+        tags:         saved.tags,
+      },
+      activeSessionId: session.id,
+      previewTask:     null,
+      guestTask:       null,
+    });
+    await useSubscriptionStore.getState().incrementTaskCount();
+  },
+
   async closeSession(status) {
     const { activeSessionId } = get();
+    console.log('[closeSession] status:', status, 'sessionId:', activeSessionId);
     if (activeSessionId) {
       await sessionsApi.updateStatus(activeSessionId, status);
+      console.log('[closeSession] updateStatus done');
+    } else {
+      console.warn('[closeSession] no activeSessionId — updateStatus skipped');
     }
     // Clear guest task if any
     await AsyncStorage.removeItem('guest_active_task');

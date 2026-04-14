@@ -1564,10 +1564,23 @@
                     "success": true,
                     "data": {
                       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-                      "taskId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
                       "status": "ACTIVE",
                       "startedAt": "2026-03-15T09:30:00.000Z",
-                      "completedAt": null
+                      "completedAt": null,
+                      "task": {
+                        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                        "title": "Shadows Only",
+                        "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                        "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                        "category": "VISUAL",
+                        "level": "BEGINNER",
+                        "durationMins": 60,
+                        "tags": [
+                          "light",
+                          "shadow",
+                          "abstract"
+                        ]
+                      }
                     },
                     "meta": {
                       "timestamp": "2026-03-15T10:00:00.000Z"
@@ -1649,7 +1662,7 @@
         ]
       },
       "get": {
-        "description": "Returns the user's session history with cursor-based pagination. Optionally filter by status.",
+        "description": "Returns the user's session history with cursor-based pagination. Each session includes the full embedded task resolved for the requested locale.",
         "operationId": "SessionsController_findAll",
         "parameters": [
           {
@@ -1701,7 +1714,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Paginated session list.",
+            "description": "Paginated session list with embedded tasks.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1711,21 +1724,43 @@
                       "items": [
                         {
                           "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-                          "taskId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-                          "category": "VISUAL",
-                          "level": "BEGINNER",
-                          "status": "COMPLETED",
+                          "status": "ACTIVE",
                           "startedAt": "2026-03-15T09:30:00.000Z",
-                          "completedAt": "2026-03-15T10:00:00.000Z"
+                          "completedAt": null,
+                          "task": {
+                            "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                            "title": "Shadows Only",
+                            "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                            "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                            "category": "VISUAL",
+                            "level": "BEGINNER",
+                            "durationMins": 60,
+                            "tags": [
+                              "light",
+                              "shadow",
+                              "abstract"
+                            ]
+                          }
                         },
                         {
                           "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
-                          "taskId": "e5f6a7b8-c9d0-1234-efab-345678901234",
-                          "category": "SOCIAL",
-                          "level": "INTERMEDIATE",
                           "status": "SKIPPED",
                           "startedAt": "2026-03-14T14:00:00.000Z",
-                          "completedAt": null
+                          "completedAt": null,
+                          "task": {
+                            "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+                            "title": "Strangers in the City",
+                            "description": "Photograph strangers in candid moments on the street.",
+                            "tip": "Smile and ask permission when in doubt.",
+                            "category": "SOCIAL",
+                            "level": "INTERMEDIATE",
+                            "durationMins": 90,
+                            "tags": [
+                              "people",
+                              "candid",
+                              "street"
+                            ]
+                          }
                         }
                       ],
                       "nextCursor": null,
@@ -1773,7 +1808,7 @@
     },
     "/sessions/active": {
       "get": {
-        "description": "Returns the current active task session with full task details. Use on app launch to restore an in-progress task.",
+        "description": "Returns the current active task session with embedded task details resolved for the requested locale.",
         "operationId": "SessionsController_getActive",
         "parameters": [
           {
@@ -1788,7 +1823,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Active session with task details.",
+            "description": "Active session with embedded task.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1796,19 +1831,23 @@
                     "success": true,
                     "data": {
                       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-                      "title": "Shadows Only",
-                      "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
-                      "tip": "Look for long shadows in the morning or evening when the sun is low.",
-                      "category": "VISUAL",
-                      "level": "BEGINNER",
-                      "durationMins": 60,
-                      "tags": [
-                        "light",
-                        "shadow",
-                        "abstract"
-                      ],
-                      "sessionId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-                      "startedAt": "2026-03-15T09:30:00.000Z"
+                      "status": "ACTIVE",
+                      "startedAt": "2026-03-15T09:30:00.000Z",
+                      "completedAt": null,
+                      "task": {
+                        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                        "title": "Shadows Only",
+                        "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                        "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                        "category": "VISUAL",
+                        "level": "BEGINNER",
+                        "durationMins": 60,
+                        "tags": [
+                          "light",
+                          "shadow",
+                          "abstract"
+                        ]
+                      }
                     },
                     "meta": {
                       "timestamp": "2026-03-15T10:00:00.000Z"
@@ -1907,7 +1946,7 @@
         },
         "responses": {
           "200": {
-            "description": "Session updated.",
+            "description": "Session updated with embedded task.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1915,10 +1954,23 @@
                     "success": true,
                     "data": {
                       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-                      "taskId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
                       "status": "COMPLETED",
                       "startedAt": "2026-03-15T09:30:00.000Z",
-                      "completedAt": "2026-03-15T10:00:00.000Z"
+                      "completedAt": "2026-03-15T10:00:00.000Z",
+                      "task": {
+                        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+                        "title": "Shadows Only",
+                        "description": "Find and photograph only shadows — no subjects, just their shadows on surfaces.",
+                        "tip": "Look for long shadows in the morning or evening when the sun is low.",
+                        "category": "VISUAL",
+                        "level": "BEGINNER",
+                        "durationMins": 60,
+                        "tags": [
+                          "light",
+                          "shadow",
+                          "abstract"
+                        ]
+                      }
                     },
                     "meta": {
                       "timestamp": "2026-03-15T10:00:00.000Z"
@@ -3207,11 +3259,9 @@
   },
   "info": {
     "title": "StreetEye API",
-    "description": "Backend API for the StreetEye mobile app — street photography assignments, journal, and badges.\n\n**Authentication:** All protected endpoints require `Authorization: Bearer \u003Caccess_token\u003E`.\n\n**Localisation:** Pass `Accept-Language: ru` or `Accept-Language: en` to get localised content (default: `en`).\n\n**Response format:** All responses are wrapped: `{ success, data, meta: { timestamp } }`.",
+    "description": "Backend API for the StreetEye mobile app — street photography assignments, journal, and badges.\n\n**Authentication:** All protected endpoints require `Authorization: Bearer <access_token>`.\n\n**Localisation:** Pass `Accept-Language: ru` or `Accept-Language: en` to get localised content (default: `en`).\n\n**Response format:** All responses are wrapped: `{ success, data, meta: { timestamp } }`.",
     "version": "1.4",
-    "contact": {
-
-    }
+    "contact": {}
   },
   "tags": [
     {

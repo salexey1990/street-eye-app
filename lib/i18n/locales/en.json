@@ -124,6 +124,19 @@
       "PRO": "Pro"
     }
   },
+  "saved": {
+    "title": "Saved for later",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "more": "{{count}} more",
+    "delete": "Delete",
+    "deleteConfirmTitle": "Delete saved task?",
+    "deleteConfirm": "Delete",
+    "errors": {
+      "activeSessionExists": "Finish your current task first"
+    }
+  },
   "tabs": {
     "task": "Task",
     "journal": "Journal",

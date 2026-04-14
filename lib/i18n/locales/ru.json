@@ -124,6 +124,19 @@
       "PRO": "Профи"
     }
   },
+  "saved": {
+    "title": "Отложенные",
+    "today": "Сегодня",
+    "yesterday": "Вчера",
+    "daysAgo": "{{count}} дн. назад",
+    "more": "Ещё {{count}}",
+    "delete": "Удалить",
+    "deleteConfirmTitle": "Удалить отложенное задание?",
+    "deleteConfirm": "Удалить",
+    "errors": {
+      "activeSessionExists": "Сначала завершите текущее задание"
+    }
+  },
   "tabs": {
     "task": "Задание",
     "journal": "Дневник",
